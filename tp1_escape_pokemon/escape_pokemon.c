@@ -5,7 +5,12 @@
 int main(int argc, char *argv[])
 {
 	//Los archivos deben venir como parámetros del main
-	sala_t *sala = sala_crear_desde_archivos("???", "???");
+	if(argc != 3) {
+		printf("Numero de parametros invalido!\n");
+		return -1;
+	}
+
+	sala_t *sala = sala_crear_desde_archivos(argv[1], argv[2]);
 
 	if (sala == NULL) {
 		printf("Error al crear la sala de escape\n");
