@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#define FORMATO "%1024[^;];%1024[^;];%[^\n]\n"
+#define FORMATO "%[^;];%[^;];%[^\n]\n"
+#define MAX_CHARS_BOOL 5
 
 struct objeto *objeto_crear_desde_string(const char *string)
 {
@@ -14,7 +15,7 @@ struct objeto *objeto_crear_desde_string(const char *string)
 	if(!objeto)
 		return NULL;
 	
-	char booleano[1024];
+	char booleano[MAX_CHARS_BOOL];
 	int cantidad_leidos = sscanf(string, FORMATO, objeto->nombre, objeto->descripcion, booleano);
 
 	if(cantidad_leidos != 3) {
