@@ -12,33 +12,38 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 	sala_t *sala = malloc(sizeof(sala_t));
 	if(!sala)
 		return NULL;
+	
+	sala->cantidad_objetos = 0;
+	sala->cantidad_interacciones = 0;
 
 	FILE *f_objetos = fopen(objetos, "r");
 
-	if(!f_objetos)
+	if(!f_objetos) {
 		return sala;
+	}
 
 	char buffer[MAX_LECTURA];
 	char *linea = fgets(buffer, MAX_LECTURA, f_objetos);
+	struct objeto **bloque = malloc(sizeof(struct objeto *));
+	if(!bloque) {
+		fclose(f_objetos);
+		return sala;
+	}
+	sala->objetos = bloque;
 
 	while(linea) {
-		struct objeto *objeto = objeto_crear_desde_string(linea);
+		struct objeto *vector_objetos = realloc(vector_objetos, (sala->cantidad_objetos+1) * sizeof(struct objeto));
 		
-		if(!objeto)
-			continue;
+		
 
-		long unsigned int cant_objetos = (unsigned long int)(sala->cantidad_objetos) + 1;
-		struct objeto **vector_objetos = realloc(*vector_objetos, (cant_objetos) * sizeof(struct objeto *));
-
-		if(!vector_objetos)
-			break;
-
-		sala->objetos = vector_objetos;
-		sala->objetos[sala->cantidad_objetos-1] = objeto;
+		linea = fgets(buffer, MAX_LECTURA, f_objetos);
 	}
 
 	fclose(f_objetos);
 
+	for(int i = 0; i < sala->cantidad_objetos; i++) {
+		printf("%s\n", sala->objetos[i]->nombre);
+	}
 	// FILE *f_interacciones = fopen(interacciones, "r");
 	// if(!f_interacciones)
 	// 	return NULL;
@@ -61,17 +66,22 @@ bool sala_es_interaccion_valida(sala_t *sala, const char *verbo, const char *obj
 
 void sala_destruir(sala_t *sala)
 {
-	for(int i = sala->cantidad_objetos; i > 0; i--) {
-		free(sala->objetos[--i]);
-	}
+	if(!sala) 
+		return;
+	
+	if(sala->objetos) 
+		for(int i = 0; i < sala->cantidad_objetos; i++) {
+			free(sala->objetos[i]);
+		}
 
 	free(sala->objetos);
 
-	for(int i = sala->cantidad_interacciones; i > 0; i--) {
-		free(sala->interacciones[--i]);
-	}
+	// if(sala->interacciones) 
+	// 	for(int i = sala->cantidad_interacciones; i > 0; i--) {
+	// 		free(sala->interacciones[--i]);
+	// 	}
 
-	free(sala->interacciones);
+	// free(sala->interacciones);
 	
 	free(sala);
 }
