@@ -1,3 +1,4 @@
 .vscode
 *.out
+*.o
 tp1_escape_pokemon/comms
