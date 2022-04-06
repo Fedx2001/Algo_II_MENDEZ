@@ -1,8 +1,8 @@
 #include "estructuras.h"
 #include "sala.h"
-#include "objeto.h"
-#include "interaccion.h"
 #include "lectura_archivos.h"
+#include "liberar_memoria.h"
+#include "liberar_nombres.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -14,30 +14,36 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 	if(sala == NULL)
 		return NULL;
 
+	sala->interacciones = NULL;
+	sala->objetos = NULL;
 	sala->cantidad_objetos = 0;
 	sala->cantidad_interacciones = 0;
 
 	FILE *f_objetos = fopen(objetos, "r");
-
-	if(f_objetos == NULL)
-		return sala;
-
+	if(f_objetos == NULL) {
+		sala_destruir(sala);
+		return NULL;
+	}
 	sala->objetos = leer_objetos_de_archivo(f_objetos, &(sala->cantidad_objetos));
 	fclose(f_objetos);
 
-	if(sala->objetos == NULL)
-		return sala;
+	if(sala->objetos == NULL) {
+		sala_destruir(sala);
+		return NULL;
+	}
 
 	FILE *f_interacciones = fopen(interacciones, "r");
-
-	if(f_interacciones == NULL)
-		return sala;
-
+	if(f_interacciones == NULL) {
+		sala_destruir(sala);
+		return NULL;
+	}
 	sala->interacciones = leer_interacciones_de_archivo(f_interacciones, &(sala->cantidad_interacciones));
 	fclose(f_interacciones);
 
-	if(sala->interacciones == NULL)
-		return sala;
+	if(sala->interacciones == NULL) {
+		sala_destruir(sala);
+		return NULL;
+	}
 
 	return sala;
 }
@@ -55,14 +61,16 @@ char **sala_obtener_nombre_objetos(sala_t *sala, int *cantidad)
 		return NULL;
 	}
 
-	char *bloque;
+	char *bloque = NULL;
 
 	for(int i = 0; i < sala->cantidad_objetos; i++) {
 		bloque = malloc((strlen(sala->objetos[i]->nombre)+1) * sizeof(char));
 		if(bloque == NULL) {
+			liberar_nombres(nombres_objs, *cantidad);
 			*cantidad = -1;
-			break;
+			return NULL;
 		}
+
 		nombres_objs[i] = bloque;
 
 		strcpy(nombres_objs[i], sala->objetos[i]->nombre);
@@ -96,19 +104,9 @@ void sala_destruir(sala_t *sala)
 	if(sala == NULL)
 		return;
 
-	if(sala->objetos != NULL) {
-		for(int i = 0; i < sala->cantidad_objetos; i++) {
-			free(sala->objetos[i]);
-		}
-		free(sala->objetos);
-	}
+	liberar_objetos(sala->objetos, &(sala->cantidad_objetos));
 
-	if(sala->interacciones != NULL) {
-		for(int i = 0; i < sala->cantidad_interacciones; i++) {
-			free(sala->interacciones[i]);
-		}
-		free(sala->interacciones);
-	}
+	liberar_interacciones(sala->interacciones, &(sala->cantidad_interacciones));
 
 	free(sala);
 }

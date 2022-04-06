@@ -1,9 +1,7 @@
 #include "src/sala.h"
+#include "src/liberar_nombres.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-#define ERROR -1
-#define MAX_TEXTO 9
 
 /*
  * Recibe un puntero a un vector de nombres de objetos y la cantidad
@@ -22,30 +20,11 @@ void mostrar_nombres_objetos(char **nombres, int cantidad)
 }
 
 /*
- * Recibe un puntero a un vector de nombres de objetos y la cantidad
- * de objetos que tiene, destruyendolo y liberando toda la memoria reservada
- * para el mismo.
- *
- * Si el vector es nulo, no hace nada.
- */
-void liberar_vector_nombres(char **nombres, int cantidad)
-{
-	if(nombres == NULL)
-		return;
-
-	for(int i = 0; i < cantidad; i++) {
-		free(nombres[i]);
-	}
-
-	free(nombres);
-}
-
-/*
  * Recibe un flag booleano y devuelve un texto indicando si es válido o no.
  *
- * Resulta valido si el flag true, e invalido si el flag es false.
+ * Resulta valido si el flag es true, e invalido si el flag es false.
  */
-char *es_valido_texto(bool flag)
+char *pasear_bool_a_texto(bool flag)
 {
 	return (flag ? "Válido" : "Inválido");
 }
@@ -55,39 +34,37 @@ int main(int argc, char *argv[])
 	//Los archivos deben venir como parámetros del main
 	sala_t *sala = sala_crear_desde_archivos(argv[1], argv[2]);
 	if(argc != 3 || sala == NULL)
-		return ERROR;
+		return -1;
 
-	//Mostrar todos los objetos en la sala
-	printf("Objetos...\n");
-	int cantidad = 0;
-	char **nombres_objetos = sala_obtener_nombre_objetos(sala, &cantidad);
+	if(sala != NULL) {
+		//Mostrar todos los objetos en la sala
+		int cantidad = 0;
+		char **nombres_objetos = sala_obtener_nombre_objetos(sala, &cantidad);
+		printf("Objetos...\n");
+		mostrar_nombres_objetos(nombres_objetos, cantidad);
 
-	mostrar_nombres_objetos(nombres_objetos, cantidad);
-	liberar_vector_nombres(nombres_objetos, cantidad);
+		printf("\n");
 
-	printf("\n");
+		//Mostrar si son válidas las siguientes interacciones
+		//1. examinar habitacion
+		//2. abrir pokebola
+		//3. usar llave cajon
+		//4. quemar mesa
+		printf("Interacciones...\n");
+		bool interacc_es_valida;
 
-	//Mostrar si son válidas las siguientes interacciones
-	//1. examinar habitacion
-	//2. abrir pokebola
-	//3. usar llave cajon
-	//4. quemar mesa
-	printf("Interacciones...\n");
-	bool interaccion_es_valida;
+		interacc_es_valida = sala_es_interaccion_valida(sala, "examinar", "habitacion", "");
+		printf("Examinar la habitacion: %s\n", pasear_bool_a_texto(interacc_es_valida));
+		interacc_es_valida = sala_es_interaccion_valida(sala, "abrir", "pokebola", "_");
+		printf("Abrir pokebola: %s\n", pasear_bool_a_texto(interacc_es_valida));
+		interacc_es_valida = sala_es_interaccion_valida(sala, "usar", "llave", "cajon");
+		printf("Usar llave en el cajon: %s\n", pasear_bool_a_texto(interacc_es_valida));
+		interacc_es_valida = sala_es_interaccion_valida(sala, "quemar", "mesa", "");
+		printf("Quemar la mesa: %s\n", pasear_bool_a_texto(interacc_es_valida));
 
-	interaccion_es_valida = sala_es_interaccion_valida(sala, "examinar", "habitacion", "");
-	printf("Examinar la habitacion: %s\n", es_valido_texto(interaccion_es_valida));
+		liberar_nombres(nombres_objetos, cantidad);
 
-	interaccion_es_valida = sala_es_interaccion_valida(sala, "abrir", "pokebola", "_");
-	printf("Abrir pokebola: %s\n", es_valido_texto(interaccion_es_valida));
-
-	interaccion_es_valida = sala_es_interaccion_valida(sala, "usar", "llave", "cajon");
-	printf("Usar llave en el cajon: %s\n", es_valido_texto(interaccion_es_valida));
-
-	interaccion_es_valida = sala_es_interaccion_valida(sala, "quemar", "mesa", "");
-	printf("Quemar la mesa: %s\n", es_valido_texto(interaccion_es_valida));
-
-	sala_destruir(sala);
-
+		sala_destruir(sala);
+	}
 	return 0;
 }

@@ -1,9 +1,5 @@
 #ifndef LECTURA_ARCHIVOS_H_
 #define LECTURA_ARCHIVOS_H_
-
-#include "estructuras.h"
-#include "objeto.h"
-#include "interaccion.h"
 #include <stdlib.h>
 #include <stdio.h>
 

@@ -1,6 +1,10 @@
 #include "lectura_archivos.h"
+#include "estructuras.h"
+#include "objeto.h"
+#include "interaccion.h"
+#include "liberar_memoria.h"
 
-struct objeto **leer_objetos_de_archivo(FILE *f_objetos, int *cantidad_objetos)
+struct objeto **leer_objetos_de_archivo(FILE *f_objetos, int *cant_objetos)
 {
 	char buffer[MAX_LECTURA];
 	char *linea = fgets(buffer, MAX_LECTURA, f_objetos);
@@ -10,21 +14,21 @@ struct objeto **leer_objetos_de_archivo(FILE *f_objetos, int *cantidad_objetos)
 	struct objeto **bloque = NULL;
 
 	while(linea) {
-		bloque = realloc(objetos, ((unsigned)*cantidad_objetos+1) * sizeof(struct objeto *));
-		if(!bloque)
+		bloque = realloc(objetos, ((unsigned)*cant_objetos+1) * sizeof(struct objeto *));
+		if(bloque == NULL)
 			return NULL;
 
 		objetos = bloque;
 
 		struct objeto *objeto_actual = objeto_crear_desde_string(linea);
-		if(!objeto_actual) {
-			free(objetos);
+		if(objeto_actual == NULL) {
+			liberar_objetos(objetos, cant_objetos);
 			return NULL;
 		}
 
-		objetos[*cantidad_objetos] = objeto_actual;
+		objetos[*cant_objetos] = objeto_actual;
 
-		(*cantidad_objetos)++;
+		(*cant_objetos)++;
 
 		linea = fgets(buffer, MAX_LECTURA, f_objetos);
 	}
@@ -32,7 +36,7 @@ struct objeto **leer_objetos_de_archivo(FILE *f_objetos, int *cantidad_objetos)
 	return objetos;
 }
 
-struct interaccion **leer_interacciones_de_archivo(FILE *f_interacciones, int *cantidad_interacciones)
+struct interaccion **leer_interacciones_de_archivo(FILE *f_interacciones, int *cant_interacc)
 {
 	char buffer[MAX_LECTURA];
 	char *linea = fgets(buffer, MAX_LECTURA, f_interacciones);
@@ -42,22 +46,22 @@ struct interaccion **leer_interacciones_de_archivo(FILE *f_interacciones, int *c
 	struct interaccion **bloque = NULL;
 
 	while(linea) {
-		bloque = realloc(interacciones, ((unsigned)*cantidad_interacciones+1) * sizeof(struct objeto *));
-		if(!bloque)
+		bloque = realloc(interacciones, ((unsigned)*cant_interacc+1) * sizeof(struct objeto *));
+		if(bloque == NULL)
 			return NULL;
 
 		interacciones = bloque;
 
 		struct interaccion *interaccion_actual = interaccion_crear_desde_string(linea);
 
-		if(!interaccion_actual) {
-			free(interacciones);
+		if(interaccion_actual == NULL) {
+			liberar_interacciones(interacciones, cant_interacc);
 			return NULL;
 		}
 
-		interacciones[*cantidad_interacciones] = interaccion_actual;
+		interacciones[*cant_interacc] = interaccion_actual;
 
-		(*cantidad_interacciones)++;
+		(*cant_interacc)++;
 
 		linea = fgets(buffer, MAX_LECTURA, f_interacciones);
 	}
