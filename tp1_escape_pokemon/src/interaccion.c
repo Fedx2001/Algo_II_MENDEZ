@@ -12,7 +12,7 @@ struct interaccion *interaccion_crear_desde_string(const char *string)
 {
 	struct interaccion *interaccion = malloc(sizeof(struct interaccion));
 	struct accion accion;
-	if(interaccion == NULL)
+	if(interaccion == NULL || string == NULL)
 		return NULL;
 
 	int leidos_interacc = sscanf(string, FORMATO_INTERACCION, interaccion->objeto, interaccion->verbo, interaccion->objeto_parametro);

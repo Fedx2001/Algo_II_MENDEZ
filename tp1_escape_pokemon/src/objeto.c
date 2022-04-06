@@ -11,7 +11,7 @@ struct objeto *objeto_crear_desde_string(const char *string)
 {
 	struct objeto *objeto = malloc(sizeof(struct objeto));
 
-	if(objeto == NULL)
+	if(objeto == NULL || string == NULL)
 		return NULL;
 
 	char flag[MAX_CHARS_BOOL];
