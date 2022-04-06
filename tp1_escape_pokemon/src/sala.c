@@ -62,7 +62,7 @@ char **sala_obtener_nombre_objetos(sala_t *sala, int *cantidad)
 	}
 
 	char *bloque = NULL;
-
+	*cantidad = 0;
 	for(int i = 0; i < sala->cantidad_objetos; i++) {
 		bloque = malloc((strlen(sala->objetos[i]->nombre)+1) * sizeof(char));
 		if(bloque == NULL) {
@@ -83,11 +83,14 @@ char **sala_obtener_nombre_objetos(sala_t *sala, int *cantidad)
 bool sala_es_interaccion_valida(sala_t *sala, const char *verbo, const char *objeto1,
 				const char *objeto2)
 {
+	if(sala == NULL || verbo == NULL || objeto1 == NULL)
+		return false;
+
 	for(int i = 0; i < sala->cantidad_interacciones; i++) {
 		int cmp_verbo = strcmp(sala->interacciones[i]->verbo, verbo);
 		int cmp_objeto1 = strcmp(sala->interacciones[i]->objeto, objeto1);
-		int cmp_objeto2;
-		if(strcmp(objeto2, "_") == 0){
+		int cmp_objeto2 = -1;
+		if(objeto2 == NULL || strcmp(objeto2, "_") == 0){
 			cmp_objeto2 = strcmp(sala->interacciones[i]->objeto_parametro, "");
 		} else {
 			cmp_objeto2 = strcmp(sala->interacciones[i]->objeto_parametro, objeto2);

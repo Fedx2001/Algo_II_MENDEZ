@@ -7,15 +7,15 @@
 
 #define FORMATO_INTERACCION "%[^;];%[^;];%[^;];%*[^:]:%*[^:]:%*[^\n]\n"
 #define FORMATO_ACCION "%*[^;];%*[^;];%*[^;];%[^:]:%[^:]:%[^\n]\n"
-#define MAX_LINEA 1024
 #define MAX_TIPO 2
 
 struct interaccion *interaccion_crear_desde_string(const char *string)
 {
 	struct interaccion *interaccion = malloc(sizeof(struct interaccion));
-	struct accion accion;
-	if(interaccion == NULL || string == NULL)
+	struct accion accion = {ACCION_INVALIDA, "", ""};
+	if(interaccion == NULL || string == NULL || strcmp(string, "") == 0)
 		return NULL;
+	interaccion->accion = accion;
 
 	int leidos_interacc = sscanf(string, FORMATO_INTERACCION, interaccion->objeto, interaccion->verbo, interaccion->objeto_parametro);
 	if(strcmp(interaccion->objeto_parametro, "_") == 0)
@@ -23,13 +23,13 @@ struct interaccion *interaccion_crear_desde_string(const char *string)
 	
 	char str_tipo[MAX_TIPO];
 	int leidos_accion = sscanf(string, FORMATO_ACCION, str_tipo, accion.objeto, accion.mensaje);
-	if(strcmp(accion.objeto, "_") == 0)
-		strcpy(accion.objeto, "");
 
 	if(leidos_interacc != 3 || leidos_accion != 3 || str_tipo[1] != '\0') {
 		free(interaccion);
 		return NULL;
 	}
+	if(strcmp(accion.objeto, "_") == 0)
+		strcpy(accion.objeto, "");
 
 	char tipo_acc = str_tipo[0];
 
