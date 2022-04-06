@@ -22,7 +22,7 @@ struct objeto **leer_objetos_de_archivo(FILE *f_objetos, int *cant_objetos)
 
 		struct objeto *objeto_actual = objeto_crear_desde_string(linea);
 		if(objeto_actual == NULL) {
-			liberar_objetos(objetos, cant_objetos);
+			liberar_objetos(objetos, *cant_objetos);
 			return NULL;
 		}
 
@@ -55,7 +55,7 @@ struct interaccion **leer_interacciones_de_archivo(FILE *f_interacciones, int *c
 		struct interaccion *interaccion_actual = interaccion_crear_desde_string(linea);
 
 		if(interaccion_actual == NULL) {
-			liberar_interacciones(interacciones, cant_interacc);
+			liberar_interacciones(interacciones, *cant_interacc);
 			return NULL;
 		}
 

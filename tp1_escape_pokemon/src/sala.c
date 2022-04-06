@@ -50,7 +50,11 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 
 char **sala_obtener_nombre_objetos(sala_t *sala, int *cantidad)
 {
-	if(sala == NULL || sala->objetos == NULL || sala->cantidad_objetos <= 0) {
+	if(cantidad == NULL) {
+		//TODO contemplar cantidad = NULL
+	}
+
+	if(sala->objetos == NULL || sala->cantidad_objetos < 0) {
 		*cantidad = -1;
 		return NULL;
 	}
@@ -62,11 +66,10 @@ char **sala_obtener_nombre_objetos(sala_t *sala, int *cantidad)
 	}
 
 	char *bloque = NULL;
-	*cantidad = 0;
 	for(int i = 0; i < sala->cantidad_objetos; i++) {
 		bloque = malloc((strlen(sala->objetos[i]->nombre)+1) * sizeof(char));
 		if(bloque == NULL) {
-			liberar_nombres(nombres_objs, *cantidad);
+			liberar_nombres(nombres_objs, cantidad);
 			*cantidad = -1;
 			return NULL;
 		}
@@ -74,9 +77,10 @@ char **sala_obtener_nombre_objetos(sala_t *sala, int *cantidad)
 		nombres_objs[i] = bloque;
 
 		strcpy(nombres_objs[i], sala->objetos[i]->nombre);
-		(*cantidad)++;
 	}
 
+	*cantidad = sala->cantidad_objetos;
+	
 	return nombres_objs;
 }
 
@@ -107,9 +111,9 @@ void sala_destruir(sala_t *sala)
 	if(sala == NULL)
 		return;
 
-	liberar_objetos(sala->objetos, &(sala->cantidad_objetos));
+	liberar_objetos(sala->objetos, sala->cantidad_objetos);
 
-	liberar_interacciones(sala->interacciones, &(sala->cantidad_interacciones));
+	liberar_interacciones(sala->interacciones, sala->cantidad_interacciones);
 
 	free(sala);
 }

@@ -9,12 +9,12 @@
  *
  * Si el vector es nulo, no hace nada.
  */
-void mostrar_nombres_objetos(char **nombres, int cantidad)
+void mostrar_nombres_objetos(char **nombres, int *cantidad)
 {
-	if(nombres == NULL)
+	if(nombres == NULL || cantidad == NULL)
 		return;
 
-	for(int i = 0; i < cantidad; i++) {
+	for(int i = 0; i < *cantidad; i++) {
 		printf("%i: %s\n", i, nombres[i]);
 	}
 }
@@ -31,25 +31,21 @@ char *pasear_bool_a_texto(bool flag)
 
 int main(int argc, char *argv[])
 {
-	//Los archivos deben venir como parámetros del main
-	sala_t *sala = sala_crear_desde_archivos(argv[1], argv[2]);
-	if(argc != 3 || sala == NULL)
+	if(argc != 3)
 		return -1;
 
+	sala_t *sala = sala_crear_desde_archivos(argv[1], argv[2]);
+
 	if(sala != NULL) {
-		//Mostrar todos los objetos en la sala
-		int cantidad = 0;
-		char **nombres_objetos = sala_obtener_nombre_objetos(sala, &cantidad);
 		printf("Objetos...\n");
-		mostrar_nombres_objetos(nombres_objetos, cantidad);
+		int *cant_og = NULL;
+		printf("Cantidad esta en %p\n", &cant_og);
+		printf("Cantidad apunta a %p\n", cant_og);
+		char **nombres_objetos = sala_obtener_nombre_objetos(sala, cant_og);
+		printf("Cantidad apunta a %p\n", cant_og);
+		mostrar_nombres_objetos(nombres_objetos, cant_og);
+		printf("%i\n", *cant_og);
 
-		printf("\n");
-
-		//Mostrar si son válidas las siguientes interacciones
-		//1. examinar habitacion
-		//2. abrir pokebola
-		//3. usar llave cajon
-		//4. quemar mesa
 		printf("Interacciones...\n");
 		bool interacc_es_valida;
 
@@ -62,8 +58,7 @@ int main(int argc, char *argv[])
 		interacc_es_valida = sala_es_interaccion_valida(sala, "quemar", "mesa", "");
 		printf("Quemar la mesa: %s\n", pasear_bool_a_texto(interacc_es_valida));
 
-		liberar_nombres(nombres_objetos, cantidad);
-
+		liberar_nombres(nombres_objetos, cant_og);
 		sala_destruir(sala);
 	}
 	return 0;

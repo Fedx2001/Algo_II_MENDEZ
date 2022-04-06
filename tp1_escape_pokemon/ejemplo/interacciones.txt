@@ -1,4 +1,3 @@
-a;b;c:d:e
 pokebola;abrir;_;d:anillo:hay un anillo dentro de la pokebola
 mesa;examinar;_;d:pokebola:Notas que hay una pokebola sobre la mesa
 mesa;examinar;_;d:cajon:La mesa tiene un cajón
