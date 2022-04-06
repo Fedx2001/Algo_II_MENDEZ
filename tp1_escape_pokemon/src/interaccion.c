@@ -2,6 +2,8 @@
 #include "interaccion.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <strings.h>
 
 #define FORMATO_INTERACCION "%[^;];%[^;];%[^;];%*[^:]:%*[^:]:%*[^\n]\n"
 #define FORMATO_ACCION "%*[^;];%*[^;];%*[^;];%[^:]:%[^:]:%[^\n]\n"
@@ -16,10 +18,15 @@ struct interaccion *interaccion_crear_desde_string(const char *string)
 		return NULL;
 
 	int leidos_interacc = sscanf(string, FORMATO_INTERACCION, interaccion->objeto, interaccion->verbo, interaccion->objeto_parametro);
+	if(strcmp(interaccion->objeto_parametro, "_") == 0)
+		strcpy(interaccion->objeto_parametro, "");
+	
 	char str_tipo[MAX_TIPO];
 	int leidos_accion = sscanf(string, FORMATO_ACCION, str_tipo, accion.objeto, accion.mensaje);
+	if(strcmp(accion.objeto, "_") == 0)
+		strcpy(accion.objeto, "");
 
-	if(leidos_interacc != 3 || leidos_accion != 3) {
+	if(leidos_interacc != 3 || leidos_accion != 3 || str_tipo[1] != '\0') {
 		free(interaccion);
 		return NULL;
 	}

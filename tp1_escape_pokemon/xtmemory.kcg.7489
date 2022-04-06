@@ -1,0 +1,623 @@
+# callgrind format
+version: 1
+creator: xtree-1
+pid: 7489
+cmd: ./escape.o ejemplo/objetos.txt ejemplo/interacciones.txt
+
+positions: line
+event: curB : currently allocated Bytes
+event: curBk : currently allocated Blocks
+event: totB : total allocated Bytes
+event: totBk : total allocated Blocks
+event: totFdB : total Freed Bytes
+event: totFdBk : total Freed Blocks
+events: curB  curBk  totB  totBk  totFdB  totFdBk 
+fl=(1) /home/thy/Algo_II_MENDEZ/tp1_escape_pokemon/escape_pokemon.c
+fn=(1) main
+37
+cfi=(2) /home/thy/Algo_II_MENDEZ/tp1_escape_pokemon/src/sala.c
+cfn=(2) sala_crear_desde_archivos
+calls=0 13
+37 0 0 32 1 0 0
+fl=(2)
+fn=(2)
+13 0 0 32 1 0 0
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 22
+37 0 0 472 1 0 0
+fl=(2)
+fn=(2)
+22
+cfi=(3) /build/glibc-YYA7BZ/glibc-2.31/libio/iofopen.c
+cfn=(3) fopen@@GLIBC_2.2.5
+calls=0 65
+22 0 0 472 1 0 0
+fl=(3)
+fn=(3)
+65 0 0 472 1 0 0
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 29
+37 0 0 4096 1 0 0
+fl=(2)
+fn=(2)
+29
+cfi=(4) /home/thy/Algo_II_MENDEZ/tp1_escape_pokemon/src/lectura_archivos.c
+cfn=(4) leer_objetos_de_archivo
+calls=0 10
+29 0 0 4096 1 0 0
+fl=(4)
+fn=(4)
+10
+cfi=(5) /build/glibc-YYA7BZ/glibc-2.31/libio/iofgets.c
+cfn=(5) fgets
+calls=0 53
+10 0 0 4096 1 0 0
+fl=(5)
+fn=(5)
+53
+cfi=(6) /build/glibc-YYA7BZ/glibc-2.31/libio/iogetline.c
+cfn=(6) _IO_getline_info
+calls=0 60
+53 0 0 4096 1 0 0
+fl=(6)
+fn=(6)
+60
+cfi=(7) /build/glibc-YYA7BZ/glibc-2.31/libio/genops.c
+cfn=(7) _IO_default_uflow
+calls=0 362
+60 0 0 4096 1 0 0
+fl=(7)
+fn=(7)
+362
+cfi=(8) /build/glibc-YYA7BZ/glibc-2.31/libio/fileops.c
+cfn=(8) _IO_file_underflow@@GLIBC_2.2.5
+calls=0 486
+362 0 0 4096 1 0 0
+fl=(8)
+fn=(8)
+486
+cfi=(7)
+cfn=(9) _IO_doallocbuf
+calls=0 347
+486 0 0 4096 1 0 0
+fl=(7)
+fn=(9)
+347
+cfi=(9) /build/glibc-YYA7BZ/glibc-2.31/libio/filedoalloc.c
+cfn=(10) _IO_file_doallocate
+calls=0 101
+347 0 0 4096 1 0 0
+fl=(9)
+fn=(10)
+101 0 0 4096 1 0 0
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 29
+37 0 0 8 1 0 0
+fl=(2)
+fn=(2)
+29
+cfi=(4)
+cfn=(4)
+calls=0 17
+29 0 0 8 1 0 0
+fl=(4)
+fn=(4)
+17
+cfi=(10) UnknownFile???
+cfn=(11) realloc
+calls=0 0
+17 0 0 8 1 0 0
+fl=(10)
+fn=(11)
+0 0 0 8 1 0 0
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 29
+37 0 0 1989 9 0 0
+fl=(2)
+fn=(2)
+29
+cfi=(4)
+cfn=(4)
+calls=0 23
+29 0 0 1989 9 0 0
+fl=(4)
+fn=(4)
+23
+cfi=(11) /home/thy/Algo_II_MENDEZ/tp1_escape_pokemon/src/objeto.c
+cfn=(12) objeto_crear_desde_string
+calls=0 12
+23 0 0 1989 9 0 0
+fl=(11)
+fn=(12)
+12 0 0 1989 9 0 0
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 29
+37 0 0 352 8 288 8
+fl=(2)
+fn=(2)
+29
+cfi=(4)
+cfn=(4)
+calls=0 17
+29 0 0 352 8 288 8
+fl=(4)
+fn=(4)
+17 0 0 352 8 288 8
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 30
+37 0 0 0 0 4096 1
+fl=(2)
+fn=(2)
+30
+cfi=(12) /build/glibc-YYA7BZ/glibc-2.31/libio/iofclose.c
+cfn=(13) fclose@@GLIBC_2.2.5
+calls=0 53
+30 0 0 0 0 4096 1
+fl=(12)
+fn=(13)
+53
+cfi=(8)
+cfn=(14) _IO_file_close_it@@GLIBC_2.2.5
+calls=0 154
+53 0 0 0 0 4096 1
+fl=(8)
+fn=(14)
+154
+cfi=(7)
+cfn=(15) _IO_setb
+calls=0 331
+154 0 0 0 0 4096 1
+fl=(7)
+fn=(15)
+331 0 0 0 0 4096 1
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 30
+37 0 0 0 0 472 1
+fl=(2)
+fn=(2)
+30
+cfi=(13) /build/glibc-YYA7BZ/glibc-2.31/libio/libioP.h
+cfn=(13)
+calls=0 863
+30 0 0 0 0 472 1
+fl=(13)
+fn=(13)
+863 0 0 0 0 472 1
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 37
+37 0 0 472 1 0 0
+fl=(2)
+fn=(2)
+37
+cfi=(3)
+cfn=(3)
+calls=0 65
+37 0 0 472 1 0 0
+fl=(3)
+fn=(3)
+65 0 0 472 1 0 0
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 44
+37 0 0 4096 1 0 0
+fl=(2)
+fn=(2)
+44
+cfi=(4)
+cfn=(16) leer_interacciones_de_archivo
+calls=0 42
+44 0 0 4096 1 0 0
+fl=(4)
+fn=(16)
+42
+cfi=(5)
+cfn=(5)
+calls=0 53
+42 0 0 4096 1 0 0
+fl=(5)
+fn=(5)
+53
+cfi=(6)
+cfn=(6)
+calls=0 60
+53 0 0 4096 1 0 0
+fl=(6)
+fn=(6)
+60
+cfi=(7)
+cfn=(7)
+calls=0 362
+60 0 0 4096 1 0 0
+fl=(7)
+fn=(7)
+362
+cfi=(8)
+cfn=(8)
+calls=0 486
+362 0 0 4096 1 0 0
+fl=(8)
+fn=(8)
+486
+cfi=(7)
+cfn=(9)
+calls=0 347
+486 0 0 4096 1 0 0
+fl=(7)
+fn=(9)
+347
+cfi=(9)
+cfn=(10)
+calls=0 101
+347 0 0 4096 1 0 0
+fl=(9)
+fn=(10)
+101 0 0 4096 1 0 0
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 44
+37 0 0 8 1 0 0
+fl=(2)
+fn=(2)
+44
+cfi=(4)
+cfn=(16)
+calls=0 49
+44 0 0 8 1 0 0
+fl=(4)
+fn=(16)
+49
+cfi=(10)
+cfn=(11)
+calls=0 0
+49 0 0 8 1 0 0
+fl=(10)
+fn=(11)
+0 0 0 8 1 0 0
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 44
+37 0 0 2556 9 0 0
+fl=(2)
+fn=(2)
+44
+cfi=(4)
+cfn=(16)
+calls=0 55
+44 0 0 2556 9 0 0
+fl=(4)
+fn=(16)
+55
+cfi=(14) /home/thy/Algo_II_MENDEZ/tp1_escape_pokemon/src/interaccion.c
+cfn=(17) interaccion_crear_desde_string
+calls=0 13
+55 0 0 2556 9 0 0
+fl=(14)
+fn=(17)
+13 0 0 2556 9 0 0
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 44
+37 0 0 352 8 288 8
+fl=(2)
+fn=(2)
+44
+cfi=(4)
+cfn=(16)
+calls=0 49
+44 0 0 352 8 288 8
+fl=(4)
+fn=(16)
+49 0 0 352 8 288 8
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 45
+37 0 0 0 0 4096 1
+fl=(2)
+fn=(2)
+45
+cfi=(12)
+cfn=(13)
+calls=0 53
+45 0 0 0 0 4096 1
+fl=(12)
+fn=(13)
+53
+cfi=(8)
+cfn=(14)
+calls=0 154
+53 0 0 0 0 4096 1
+fl=(8)
+fn=(14)
+154
+cfi=(7)
+cfn=(15)
+calls=0 331
+154 0 0 0 0 4096 1
+fl=(7)
+fn=(15)
+331 0 0 0 0 4096 1
+
+fl=(1)
+fn=(1)
+37
+cfi=(2)
+cfn=(2)
+calls=0 45
+37 0 0 0 0 472 1
+fl=(2)
+fn=(2)
+45
+cfi=(13)
+cfn=(13)
+calls=0 863
+45 0 0 0 0 472 1
+fl=(13)
+fn=(13)
+863 0 0 0 0 472 1
+
+fl=(1)
+fn=(1)
+44
+cfi=(2)
+cfn=(18) sala_obtener_nombre_objetos
+calls=0 62
+44 0 0 72 1 0 0
+fl=(2)
+fn=(18)
+62 0 0 72 1 0 0
+
+fl=(1)
+fn=(1)
+44
+cfi=(2)
+cfn=(18)
+calls=0 71
+44 0 0 77 9 0 0
+fl=(2)
+fn=(18)
+71 0 0 77 9 0 0
+
+fl=(1)
+fn=(1)
+45
+cfi=(15) /build/glibc-YYA7BZ/glibc-2.31/libio/ioputs.c
+cfn=(19) puts
+calls=0 40
+45 0 0 1024 1 0 0
+fl=(15)
+fn=(19)
+40
+cfi=(8)
+cfn=(20) _IO_file_xsputn@@GLIBC_2.2.5
+calls=0 1244
+40 0 0 1024 1 0 0
+fl=(8)
+fn=(20)
+1244
+cfi=(8)
+cfn=(21) _IO_file_overflow@@GLIBC_2.2.5
+calls=0 745
+1244 0 0 1024 1 0 0
+fl=(8)
+fn=(21)
+745
+cfi=(7)
+cfn=(9)
+calls=0 347
+745 0 0 1024 1 0 0
+fl=(7)
+fn=(9)
+347
+cfi=(9)
+cfn=(10)
+calls=0 101
+347 0 0 1024 1 0 0
+fl=(9)
+fn=(10)
+101 0 0 1024 1 0 0
+
+fl=(1)
+fn=(1)
+67
+cfi=(16) /home/thy/Algo_II_MENDEZ/tp1_escape_pokemon/src/liberar_nombres.c
+cfn=(22) liberar_nombres
+calls=0 10
+67 0 0 0 0 77 9
+fl=(16)
+fn=(22)
+10 0 0 0 0 77 9
+
+fl=(1)
+fn=(1)
+67
+cfi=(16)
+cfn=(22)
+calls=0 13
+67 0 0 0 0 72 1
+fl=(16)
+fn=(22)
+13 0 0 0 0 72 1
+
+fl=(1)
+fn=(1)
+69
+cfi=(2)
+cfn=(23) sala_destruir
+calls=0 111
+69 0 0 0 0 1989 9
+fl=(2)
+fn=(23)
+111
+cfi=(17) /home/thy/Algo_II_MENDEZ/tp1_escape_pokemon/src/liberar_memoria.c
+cfn=(24) liberar_objetos
+calls=0 11
+111 0 0 0 0 1989 9
+fl=(17)
+fn=(24)
+11 0 0 0 0 1989 9
+
+fl=(1)
+fn=(1)
+69
+cfi=(2)
+cfn=(23)
+calls=0 111
+69 0 0 0 0 72 1
+fl=(2)
+fn=(23)
+111
+cfi=(17)
+cfn=(24)
+calls=0 14
+111 0 0 0 0 72 1
+fl=(17)
+fn=(24)
+14 0 0 0 0 72 1
+
+fl=(1)
+fn=(1)
+69
+cfi=(2)
+cfn=(23)
+calls=0 113
+69 0 0 0 0 2556 9
+fl=(2)
+fn=(23)
+113
+cfi=(17)
+cfn=(25) liberar_interacciones
+calls=0 25
+113 0 0 0 0 2556 9
+fl=(17)
+fn=(25)
+25 0 0 0 0 2556 9
+
+fl=(1)
+fn=(1)
+69
+cfi=(2)
+cfn=(23)
+calls=0 113
+69 0 0 0 0 72 1
+fl=(2)
+fn=(23)
+113
+cfi=(17)
+cfn=(25)
+calls=0 28
+113 0 0 0 0 72 1
+fl=(17)
+fn=(25)
+28 0 0 0 0 72 1
+
+fl=(1)
+fn=(1)
+69
+cfi=(2)
+cfn=(23)
+calls=0 115
+69 0 0 0 0 32 1
+fl=(2)
+fn=(23)
+115 0 0 0 0 32 1
+
+fl=(18) /build/glibc-YYA7BZ/glibc-2.31/csu/../csu/libc-start.c
+fn=(26) (below main)
+342
+cfi=(19) /build/glibc-YYA7BZ/glibc-2.31/stdlib/exit.c
+cfn=(27) exit
+calls=0 139
+342 0 0 0 0 1024 1
+fl=(19)
+fn=(27)
+139
+cfi=(19)
+cfn=(28) __run_exit_handlers
+calls=0 132
+139 0 0 0 0 1024 1
+fl=(19)
+fn=(28)
+132
+cfi=(10)
+cfn=(29) _vgnU_freeres
+calls=0 0
+132 0 0 0 0 1024 1
+fl=(10)
+fn=(29)
+0
+cfi=(10)
+cfn=(30) __libc_freeres
+calls=0 0
+0 0 0 0 0 1024 1
+fl=(10)
+fn=(30)
+0
+cfi=(10)
+cfn=(31) buffer_free
+calls=0 0
+0 0 0 0 0 1024 1
+fl=(10)
+fn=(31)
+0 0 0 0 0 1024 1
+
+totals: 0 0 15606 52 15606 52

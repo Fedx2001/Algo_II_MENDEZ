@@ -87,8 +87,8 @@ bool sala_es_interaccion_valida(sala_t *sala, const char *verbo, const char *obj
 		int cmp_verbo = strcmp(sala->interacciones[i]->verbo, verbo);
 		int cmp_objeto1 = strcmp(sala->interacciones[i]->objeto, objeto1);
 		int cmp_objeto2;
-		if(strcmp(objeto2, "") == 0){
-			cmp_objeto2 = strcmp(sala->interacciones[i]->objeto_parametro, "_");
+		if(strcmp(objeto2, "_") == 0){
+			cmp_objeto2 = strcmp(sala->interacciones[i]->objeto_parametro, "");
 		} else {
 			cmp_objeto2 = strcmp(sala->interacciones[i]->objeto_parametro, objeto2);
 		}
