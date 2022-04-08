@@ -1,11 +1,10 @@
 #include "objeto.h"
 #include "estructuras.h"
-#include "string_a_bool.h"
+#include "parsear_bool.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-#define FORMATO_OBJETO "%[^;];%[^;];%[^\n]\n"
-#define MAX_CHARS_BOOL 5
+#define MAX_CHARS_BOOL 1024
 
 struct objeto *objeto_crear_desde_string(const char *string)
 {
@@ -15,7 +14,7 @@ struct objeto *objeto_crear_desde_string(const char *string)
 		return NULL;
 
 	char flag[MAX_CHARS_BOOL];
-	int cantidad_leidos = sscanf(string, FORMATO_OBJETO, objeto->nombre, objeto->descripcion, flag);
+	int cantidad_leidos = sscanf(string, "%[^;];%[^;];%s%*c", objeto->nombre, objeto->descripcion, flag);
 
 	if(cantidad_leidos != 3) {
 		free(objeto);

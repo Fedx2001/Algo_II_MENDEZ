@@ -2,9 +2,8 @@
 #include "sala.h"
 #include "lectura_archivos.h"
 #include "liberar_memoria.h"
-#include "liberar_nombres.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 
@@ -14,10 +13,10 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 	if(sala == NULL)
 		return NULL;
 
-	sala->interacciones = NULL;
-	sala->objetos = NULL;
 	sala->cantidad_objetos = 0;
+	sala->objetos = NULL;
 	sala->cantidad_interacciones = 0;
+	sala->interacciones = NULL;
 
 	FILE *f_objetos = fopen(objetos, "r");
 	if(f_objetos == NULL) {
@@ -25,6 +24,7 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 		return NULL;
 	}
 	sala->objetos = leer_objetos_de_archivo(f_objetos, &(sala->cantidad_objetos));
+	
 	fclose(f_objetos);
 
 	if(sala->objetos == NULL) {
@@ -50,37 +50,26 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 
 char **sala_obtener_nombre_objetos(sala_t *sala, int *cantidad)
 {
-	if(cantidad == NULL) {
-		//TODO contemplar cantidad = NULL
-	}
-
-	if(sala->objetos == NULL || sala->cantidad_objetos < 0) {
-		*cantidad = -1;
+	if(sala == NULL || sala->objetos == NULL || sala->cantidad_objetos < 0) {
+		if(cantidad != NULL)
+			*cantidad = -1;
 		return NULL;
 	}
 
 	char **nombres_objs = malloc((unsigned int)sala->cantidad_objetos * sizeof(char *));
 	if(nombres_objs == NULL) {
-		*cantidad = -1;
+		if(cantidad != NULL)
+			*cantidad = -1;
 		return NULL;
 	}
 
-	char *bloque = NULL;
+	if(cantidad != NULL)
+		*cantidad = sala->cantidad_objetos;
+	
 	for(int i = 0; i < sala->cantidad_objetos; i++) {
-		bloque = malloc((strlen(sala->objetos[i]->nombre)+1) * sizeof(char));
-		if(bloque == NULL) {
-			liberar_nombres(nombres_objs, cantidad);
-			*cantidad = -1;
-			return NULL;
-		}
-
-		nombres_objs[i] = bloque;
-
-		strcpy(nombres_objs[i], sala->objetos[i]->nombre);
+		nombres_objs[i] = sala->objetos[i]->nombre;
 	}
 
-	*cantidad = sala->cantidad_objetos;
-	
 	return nombres_objs;
 }
 
@@ -94,7 +83,7 @@ bool sala_es_interaccion_valida(sala_t *sala, const char *verbo, const char *obj
 		int cmp_verbo = strcmp(sala->interacciones[i]->verbo, verbo);
 		int cmp_objeto1 = strcmp(sala->interacciones[i]->objeto, objeto1);
 		int cmp_objeto2 = -1;
-		if(objeto2 == NULL || strcmp(objeto2, "_") == 0){
+		if(strcmp(objeto2, "_") == 0){
 			cmp_objeto2 = strcmp(sala->interacciones[i]->objeto_parametro, "");
 		} else {
 			cmp_objeto2 = strcmp(sala->interacciones[i]->objeto_parametro, objeto2);
@@ -111,9 +100,15 @@ void sala_destruir(sala_t *sala)
 	if(sala == NULL)
 		return;
 
-	liberar_objetos(sala->objetos, sala->cantidad_objetos);
+	if(sala->objetos != NULL) {
+		liberar_objetos(sala->objetos, sala->cantidad_objetos);
+		free(sala->objetos);
+	}
 
-	liberar_interacciones(sala->interacciones, sala->cantidad_interacciones);
+	if(sala->interacciones != NULL) {
+		liberar_interacciones(sala->interacciones, sala->cantidad_interacciones);
+		free(sala->interacciones);
+	}
 
 	free(sala);
 }
