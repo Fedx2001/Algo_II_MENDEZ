@@ -24,7 +24,6 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 		return NULL;
 	}
 	sala->objetos = leer_objetos_de_archivo(f_objetos, &(sala->cantidad_objetos));
-	
 	fclose(f_objetos);
 
 	if(sala->objetos == NULL) {
@@ -100,15 +99,9 @@ void sala_destruir(sala_t *sala)
 	if(sala == NULL)
 		return;
 
-	if(sala->objetos != NULL) {
-		liberar_objetos(sala->objetos, sala->cantidad_objetos);
-		free(sala->objetos);
-	}
+	liberar_objetos(sala->objetos, sala->cantidad_objetos);
 
-	if(sala->interacciones != NULL) {
-		liberar_interacciones(sala->interacciones, sala->cantidad_interacciones);
-		free(sala->interacciones);
-	}
+	liberar_interacciones(sala->interacciones, sala->cantidad_interacciones);
 
 	free(sala);
 }

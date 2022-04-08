@@ -7,11 +7,14 @@
 
 struct interaccion *interaccion_crear_desde_string(const char *string)
 {
+	if(string == NULL || strcmp(string, "") == 0)
+		return NULL;
+
 	struct interaccion *interaccion = malloc(sizeof(struct interaccion));
 	struct accion accion = {ACCION_INVALIDA, "", ""};
-	if(interaccion == NULL || string == NULL || strcmp(string, "") == 0)
+
+	if(interaccion == NULL)
 		return NULL;
-	interaccion->accion = accion;
 
 	int leidos_interacc = sscanf(string, "%[^;];%[^;];%[^;];%*[^\n]\n", interaccion->objeto, interaccion->verbo, interaccion->objeto_parametro);
 	if(strcmp(interaccion->objeto_parametro, "_") == 0)

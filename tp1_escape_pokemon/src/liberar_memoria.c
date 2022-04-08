@@ -7,17 +7,25 @@ void liberar_objetos(struct objeto **objetos, int cant_objetos)
 	if(objetos == NULL)
 		return;
 
-	for(int i = 0; i < cant_objetos; i++) {
-		free(objetos[i]);
+	if(cant_objetos > 0) {
+		for(int i = 0; i < cant_objetos; i++) {
+			free(objetos[i]);
+		}
 	}
+
+	free(objetos);
 }
 
 void liberar_interacciones(struct interaccion **interacciones, int cant_interacc)
 {
 	if(interacciones == NULL)
 		return;
-		
-	for(int i = 0; i < cant_interacc; i++) {
-		free(interacciones[i]);
+	
+	if(cant_interacc > 0) {
+		for(int i = 0; i < cant_interacc; i++) {
+			free(interacciones[i]);
+		}
 	}
+
+	free(interacciones);
 }

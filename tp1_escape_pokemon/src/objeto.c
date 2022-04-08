@@ -3,18 +3,22 @@
 #include "parsear_bool.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
-#define MAX_CHARS_BOOL 1024
+#define MAX_CHARS_BOOL 6
 
 struct objeto *objeto_crear_desde_string(const char *string)
 {
+	if(string == NULL || strcmp(string, "") == 0)
+		return NULL;
+
 	struct objeto *objeto = malloc(sizeof(struct objeto));
 
-	if(objeto == NULL || string == NULL)
+	if(objeto == NULL)
 		return NULL;
 
 	char flag[MAX_CHARS_BOOL];
-	int cantidad_leidos = sscanf(string, "%[^;];%[^;];%s%*c", objeto->nombre, objeto->descripcion, flag);
+	int cantidad_leidos = sscanf(string, "%[^;];%[^;];%[^\n]\n", objeto->nombre, objeto->descripcion, flag);
 
 	if(cantidad_leidos != 3) {
 		free(objeto);
