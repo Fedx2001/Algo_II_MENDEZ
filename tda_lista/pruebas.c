@@ -111,16 +111,39 @@ void quitar_en_lista_con_dos_elementos_actualiza_el_tamanio_y_el_incio_y_fin_son
 	lista_insertar(lista, &elemento2);
 
 	pa2m_afirmar(lista_quitar(lista)==&elemento2, "Quitar en una lista de tamaño 2 devuelve el segundo elemento");
-	pa2m_afirmar(lista_ultimo(lista)==&elemento1, "El ultimo elemento es el primero insertado");
-	pa2m_afirmar(lista_primero(lista)==lista_ultimo(lista), "El incio y el fin son el mismo luego de quitar");
+	pa2m_afirmar(lista->nodo_fin==lista->nodo_inicio, "El incio y el fin son el mismo luego de quitar");
 	pa2m_afirmar(lista_tamanio(lista)==1, "El tamaño de la lista es 1 luego de quitar");
 
 	lista_destruir(lista);
 }
 
-void quitar_en_lista_con_mas_de_un_elemento_actualiza_el_tamanio_y_el_inicio_y_el_fin()
+void quitar_mas_de_un_elemento_actualiza_el_tamanio_y_el_fin()
 {
+	lista_t *lista = lista_crear();
+	int elementos[6] = {1, 2, 3, 4, 5, 200};
+	for(int i=0; i<6; i++)
+		lista_insertar(lista, elementos+i);
 
+	lista_quitar(lista);
+	lista_quitar(lista);
+
+	pa2m_afirmar(lista->nodo_fin->elemento==elementos+3, "Quitar mas de un elemento actualiza el nodo final correctamente");
+	pa2m_afirmar(lista_tamanio(lista)==4, "El tamaño se actualiza correctamente");
+
+	lista_destruir(lista);
+}
+
+void no_puedo_quitar_elemento_en_lista_null()
+{
+	pa2m_afirmar(lista_quitar(NULL)==NULL, "No puedo quitar un elemento de una lista NULL");
+}
+
+void no_puedo_quitar_elemento_en_lista_vacia()
+{
+	lista_t *lista = lista_crear();
+	pa2m_afirmar(lista_quitar(lista)==NULL, "No puedo quitar un elemento de una lista vacia");
+
+	lista_destruir(lista);
 }
 
 int main() {
@@ -134,11 +157,12 @@ int main() {
 	insertar_en_lista_con_un_elemento_actualiza_el_fin_y_no_altera_el_incio();
 	insertar_en_lista_con_mas_de_un_elemento_actualiza_el_fin_y_el_tamanio();
 	
-	pa2m_nuevo_grupo("Pruebas de quitar ultimo elemento");
+	pa2m_nuevo_grupo("Pruebas de quitar elementos");
 	quitar_con_un_elemento_devuelve_el_elemento_y_actualiza_el_primero_el_ultimo_y_el_tamanio();
 	quitar_en_lista_con_dos_elementos_actualiza_el_tamanio_y_el_incio_y_fin_son_iguales();
-	quitar_en_lista_con_mas_de_un_elemento_actualiza_el_tamanio_y_el_inicio_y_el_fin();
-	// ();
+	quitar_mas_de_un_elemento_actualiza_el_tamanio_y_el_fin();
+	no_puedo_quitar_elemento_en_lista_null();
+	no_puedo_quitar_elemento_en_lista_vacia();
 	// ();
 	// ();
 	// ();

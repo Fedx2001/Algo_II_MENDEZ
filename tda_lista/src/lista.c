@@ -39,7 +39,7 @@ lista_t *lista_insertar_en_posicion(lista_t *lista, void *elemento,
 
 void *lista_quitar(lista_t *lista)
 {
-	if(!lista)
+	if(!lista || !lista->nodo_fin)
 		return NULL;
 
 	void *elemento = NULL;
