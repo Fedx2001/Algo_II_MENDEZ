@@ -157,7 +157,7 @@ int main() {
 	insertar_en_lista_con_un_elemento_actualiza_el_fin_y_no_altera_el_incio();
 	insertar_en_lista_con_mas_de_un_elemento_actualiza_el_fin_y_el_tamanio();
 	
-	pa2m_nuevo_grupo("Pruebas de quitar elementos");
+	pa2m_nuevo_grupo("Pruebas de quitar elementos en lista");
 	quitar_con_un_elemento_devuelve_el_elemento_y_actualiza_el_primero_el_ultimo_y_el_tamanio();
 	quitar_en_lista_con_dos_elementos_actualiza_el_tamanio_y_el_incio_y_fin_son_iguales();
 	quitar_mas_de_un_elemento_actualiza_el_tamanio_y_el_fin();
