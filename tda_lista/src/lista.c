@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#define ERROR 0
+
 lista_t *lista_crear()
 {
 	return calloc(1, sizeof(lista_t));
@@ -187,6 +189,7 @@ bool lista_vacia(lista_t *lista)
 {
 	if(!lista)
 		return NULL;
+
 	return lista->nodo_inicio == NULL;
 }
 
@@ -245,35 +248,75 @@ lista_iterador_t *lista_iterador_crear(lista_t *lista)
 	if(!iterador)
 		return NULL;
 
+	iterador->lista = lista;
+	iterador->corriente = lista->nodo_inicio;
+
 	return iterador;
 }
 
 bool lista_iterador_tiene_siguiente(lista_iterador_t *iterador)
 {
+	if(!iterador)
+		return false;
+
+	if(iterador->corriente && iterador->corriente->siguiente)
+		return true;
+
 	return false;
 }
 
 bool lista_iterador_avanzar(lista_iterador_t *iterador)
 {
+	if(!iterador)
+		return false;
+
+	if(iterador->corriente) {
+		if(iterador->corriente->siguiente) {
+			iterador->corriente = iterador->corriente->siguiente;
+			return true;
+		} else {
+			iterador->corriente = NULL;
+			return true;
+		}
+	}
+
 	return false;
 }
 
 void *lista_iterador_elemento_actual(lista_iterador_t *iterador)
 {
+	if(!iterador)
+		return NULL;
+
 	if(!iterador->corriente)
 		return NULL;
+
 	return iterador->corriente->elemento;
 }
 
 void lista_iterador_destruir(lista_iterador_t *iterador)
 {
-	if(iterador->corriente)
-		free(iterador->corriente);
 	free(iterador);
 }
 
 size_t lista_con_cada_elemento(lista_t *lista, bool (*funcion)(void *, void *),
 			       void *contexto)
 {
-	return 0;
+	if(!lista || !funcion || !contexto)
+		return ERROR;
+
+	int cantidad_iterados = 0;
+
+	nodo_t *actual = malloc(sizeof(nodo_t));
+	if(!actual)
+		return ERROR;
+
+	while(actual) {
+		if(funcion(actual->elemento, contexto) == false)
+			return cantidad_iterados;
+		actual = actual->siguiente;
+		cantidad_iterados++;
+	} 
+
+	return cantidad_iterados;
 }
