@@ -79,7 +79,7 @@ void insertar_en_lista_con_mas_de_un_elemento_actualiza_el_fin_y_el_tamanio()
 
 	char elemento_final = 55;
 
-	pa2m_afirmar(lista_insertar(lista, &elemento_final)==lista, "Puedo insertar en una lista con más de un elemento");
+	pa2m_afirmar(lista_insertar(lista, &elemento_final)==lista, "Puedo insertar en una lista con 3 elementos");
 	pa2m_afirmar(lista_ultimo(lista)==&elemento_final, "El ultimo elemento es el insertado");
 	pa2m_afirmar(lista_tamanio(lista)==4, "La lista tiene tamaño 4");
 
@@ -155,7 +155,7 @@ int main() {
 	insertar_en_lista_vacia_actualiza_el_tamanio_el_inicio_y_el_fin();
 	puedo_insertar_un_elemento_null_en_la_lista_y_se_actualiza_el_tamanio_el_incio_y_el_fin();
 	insertar_en_lista_con_un_elemento_actualiza_el_fin_y_no_altera_el_incio();
-	insertar_en_lista_con_mas_de_un_elemento_actualiza_el_fin_y_el_tamanio();
+	insertar_en_lista_con_tres_elementos_actualiza_el_fin_y_el_tamanio();
 	
 	pa2m_nuevo_grupo("Pruebas de quitar elementos en lista");
 	quitar_con_un_elemento_devuelve_el_elemento_y_actualiza_el_primero_el_ultimo_y_el_tamanio();
