@@ -141,7 +141,7 @@ void *lista_elemento_en_posicion(lista_t *lista, size_t posicion)
 	if(lista_vacia(lista))
 		return NULL;
 
-	if(posicion > lista_tamanio(lista))
+	if(posicion >= lista_tamanio(lista))
 		return NULL;
 
 	nodo_t *nodo = lista->nodo_inicio;
@@ -191,7 +191,7 @@ void *lista_ultimo(lista_t *lista)
 bool lista_vacia(lista_t *lista)
 {
 	if(!lista)
-		return NULL;
+		return true;
 
 	return lista->nodo_inicio == NULL;
 }
@@ -297,18 +297,17 @@ void lista_iterador_destruir(lista_iterador_t *iterador)
 size_t lista_con_cada_elemento(lista_t *lista, bool (*funcion)(void *, void *),
 			       void *contexto)
 {
-	if(!lista || !funcion || !contexto)
+	if(!lista || !funcion)
 		return ERROR;
 
 	size_t cantidad_iterados = 0;
 
 	nodo_t *actual = lista->nodo_inicio;
-
 	while(actual) {
-		if(funcion(actual->elemento, contexto) == false)
-			return cantidad_iterados;
-		actual = actual->siguiente;
 		cantidad_iterados++;
+		if(funcion(actual->elemento, contexto) == false)
+			break;
+		actual = actual->siguiente;
 	} 
 
 	return cantidad_iterados;
