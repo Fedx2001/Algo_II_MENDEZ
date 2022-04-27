@@ -259,20 +259,22 @@ lista_iterador_t *lista_iterador_crear(lista_t *lista)
 
 bool lista_iterador_tiene_siguiente(lista_iterador_t *iterador)
 {
-	if(!iterador)
+	if(!iterador || !iterador->corriente)
 		return false;
 
-	if(iterador->corriente)
-		return true;
-
-	return false;
+	return true;
 }
 
 bool lista_iterador_avanzar(lista_iterador_t *iterador)
 {
-	if(lista_iterador_tiene_siguiente(iterador)) {
+	if(!iterador || !iterador->corriente)
+		return false;
+
+	if(iterador->corriente->siguiente) {
 		iterador->corriente = iterador->corriente->siguiente;
 		return true;
+	} else {
+		iterador->corriente = NULL;
 	}
 
 	return false;

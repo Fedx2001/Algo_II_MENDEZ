@@ -271,12 +271,9 @@ void no_existe_elemento_en_posicion_0_de_una_lista_null()
 	pa2m_afirmar(lista_elemento_en_posicion(NULL, 0)==NULL, "No existe elemento en posicion 0 de una lista NULL");
 }
 
-/*
-* Pruebas de iterador externo
-*/
 void un_iterador_externo_null_no_tiene_siguiente()
 {
-	pa2m_afirmar(lista_iterador_tiene_siguiente(NULL)==false, "El iterador externo NULL no tiene siguiente");
+	pa2m_afirmar(lista_iterador_tiene_siguiente(NULL)==false, "Un iterador externo NULL no tiene siguiente");
 }
 
 void crear_un_iterador_externo_de_lista_null_es_un_error()
@@ -284,17 +281,197 @@ void crear_un_iterador_externo_de_lista_null_es_un_error()
 	pa2m_afirmar(lista_iterador_crear(NULL)==NULL, "Crear un iterador de una lista NULL es un error");
 }
 
-void iterador_en_ultimo_elemento_no_tiene_siguiente()
+void iterador_en_ultimo_elemento_tiene_siguiente_y_el_elemento_actual_es_el_elemento()
 {
 	lista_t *lista = lista_crear();
 	char *elemento = "To Zanarkand"; 
 	lista_insertar(lista, elemento);
-	
+	lista_iterador_t *iterador = lista_iterador_crear(lista);
+
+	pa2m_afirmar(lista_iterador_tiene_siguiente(iterador)==true, "El iterador en el ultimo elemento de la lista no tiene siguiente");
+	pa2m_afirmar(lista_iterador_elemento_actual(iterador)==elemento, "El elemento actual es el elemento");
+
 	lista_iterador_destruir(iterador);
+
 	lista_destruir(lista);
 }
 
-void iterador_de_lista_vacia_no_tiene_siguiente_y_su_elemento_es_null();
+void iterador_de_lista_vacia_no_tiene_siguiente_y_su_elemento_es_null()
+{
+	lista_t *lista = lista_crear();
+	lista_iterador_t *iterador = lista_iterador_crear(lista);
+
+	pa2m_afirmar(lista_iterador_tiene_siguiente(iterador)==false, "El iterador de una lista vacia no tiene siguiente");
+	pa2m_afirmar(lista_iterador_elemento_actual(iterador)==NULL, "El elemento actual del iterador de una lista NULL es NULL");
+
+	lista_destruir(lista);
+	lista_iterador_destruir(iterador);
+}
+
+void puedo_recorrer_todos_los_elementos_de_la_lista_con_un_iterador_externo()
+{
+	lista_t *lista = lista_crear();
+
+	char *elementos[5] = {"Lena Raine", "Nobuo Uematsu", "Yasunori Mitsuda", "Matt Uelmen", "Toby Fox"}; 
+	for(int i=0; i<5; i++)
+		lista_insertar(lista, elementos+i);
+
+	lista_iterador_t *iterador = NULL;
+	int contador = 0;
+
+	for(iterador = lista_iterador_crear(lista); 
+		lista_iterador_tiene_siguiente(iterador);
+		lista_iterador_avanzar(iterador))
+			contador++;
+
+	pa2m_afirmar(lista_tamanio(lista)==contador, "Puedo recorrer todos los elementos de la lista con el iterador externo");
+
+	lista_iterador_destruir(iterador);
+
+	lista_destruir(lista);
+}
+
+void no_puedo_usar_iterador_interno_con_funcion_null()
+{
+	lista_t *lista = lista_crear();
+	int contexto = 10;
+
+	pa2m_afirmar(lista_con_cada_elemento(lista, NULL, &contexto)==0, "No puedo usar el interador interno con funcion NULL");
+
+	lista_destruir(lista);
+}
+
+bool es_par(void *n, void *contexto)
+{
+	int elemento = *(int *)n;
+	if(elemento%2==0)
+		return true;
+	return false;
+}
+
+void no_puedo_usar_iterador_interno_con_lista_null()
+{
+	int contexto = 2;
+	pa2m_afirmar(lista_con_cada_elemento(NULL, es_par, &contexto)==0, "No puedo usar el interador interno con lista NULL");
+
+}
+
+void puedo_usar_iterador_interno_con_contexto_null()
+{
+	lista_t *lista = lista_crear();
+	int elementos[3] = {2, 4, 6};
+	for(int i=0; i<2; i++)
+		lista_insertar(lista, elementos+i);
+
+	pa2m_afirmar(lista_con_cada_elemento(lista, es_par, NULL)!=0, "Puedo usar el interador interno con contexto NULL");
+
+	lista_destruir(lista);
+}
+
+void puedo_recorrer_toda_la_lista_con_iterador_interno()
+{
+	lista_t *lista = lista_crear();
+	int elementos[3] = {2, 4, 6};
+	for(int i=0; i<3; i++)
+		lista_insertar(lista, elementos+i);
+	
+	pa2m_afirmar(lista_con_cada_elemento(lista, es_par, NULL)==3, "Puedo recorrer toda la lista con el iterador interno");
+
+	lista_destruir(lista);
+}
+
+bool seguir_iterando(void *elemento, void *contexto)
+{
+	if(*(int *)elemento == *(int *)contexto)
+		return false;
+	return true;
+}
+
+void puedo_recorrer_3_elementos_de_una_lista_de_10_elementos_con_iterador_interno()
+{
+	lista_t *lista = lista_crear();
+	int elementos[10] = {2,4,6,7,9,10,13,15,18,20};
+	int contexto = 6;
+
+	for(int i=0; i<10; i++) {
+		lista_insertar(lista, elementos+i);
+	}
+
+	pa2m_afirmar(lista_con_cada_elemento(lista, seguir_iterando, &contexto)==3, "Buscar el tercer elemento de la lista itera 3 elementos");
+
+	lista_destruir(lista);
+}
+
+void recorrer_lista_vacia_con_iterador_interno_devuelve_0_elementos_iterados()
+{
+	lista_t *lista = lista_crear();
+	int contexto = 6;
+
+	pa2m_afirmar(lista_con_cada_elemento(lista, seguir_iterando, &contexto)==0, "Recorrer una lista vacia con el iterador interno devuelve 0 elementos iterados");
+
+	lista_destruir(lista);
+}
+
+int es_contexto(void *elemento, void *contexto)
+{
+	return *(int *)elemento == *(int *)contexto ? 0 : -1;
+}
+
+void no_puedo_buscar_un_elemento_en_una_lista_null()
+{
+	int contexto = 6;
+	pa2m_afirmar(lista_buscar_elemento(NULL, es_contexto, &contexto)==NULL, "No puedo buscar un elemento en una lista NULL");
+}
+
+void no_puedo_buscar_un_elemento_en_una_lista_con_comparador_null()
+{
+	int contexto = 6;
+	lista_t *lista = lista_crear();
+
+	pa2m_afirmar(lista_buscar_elemento(lista, NULL, &contexto)==NULL, "No puedo buscar un elemento en una lista con comparador NULL");
+
+	lista_destruir(lista);
+}
+
+void buscar_elemento_en_lista_vacia_devuelve_null()
+{
+	int contexto = 6;
+	lista_t *lista = lista_crear();
+
+	pa2m_afirmar(lista_buscar_elemento(lista, es_contexto, &contexto)==NULL, "Buscar un elemento en una lista vacia devuelve NULL");
+
+	lista_destruir(lista);
+}
+
+void buscar_elemento_inexistente_en_lista_devuelve_null()
+{
+	int a_buscar = 1;
+	lista_t *lista = lista_crear();
+
+	int elementos[10] = {2,4,6,7,9,10,13,15,18,20};
+	for(int i=0; i<10; i++) {
+		lista_insertar(lista, elementos+i);
+	}
+
+	pa2m_afirmar(lista_buscar_elemento(lista, es_contexto, &a_buscar)==NULL, "Buscar un elemento inexistente en la lista devuelve NULL");
+
+	lista_destruir(lista);
+}
+
+void buscar_elemento_existente_en_lista_devuelve_el_elemento()
+{
+	int a_buscar = 7;
+	lista_t *lista = lista_crear();
+
+	int elementos[10] = {2,4,6,7,9,10,13,15,18,20};
+	for(int i=0; i<10; i++) {
+		lista_insertar(lista, elementos+i);
+	}
+
+	pa2m_afirmar(lista_buscar_elemento(lista, es_contexto, &a_buscar)==elementos+3, "Buscar un elemento en la lista devuelve el elemento");
+
+	lista_destruir(lista);
+}
 
 void una_lista_null_esta_vacia()
 {
@@ -371,17 +548,24 @@ int main() {
 	pa2m_nuevo_grupo("Pruebas de iterador externo");
 	un_iterador_externo_null_no_tiene_siguiente();
 	crear_un_iterador_externo_de_lista_null_es_un_error();
-	iterador_en_ultimo_elemento_no_tiene_siguiente();
+	iterador_en_ultimo_elemento_tiene_siguiente_y_el_elemento_actual_es_el_elemento();
 	iterador_de_lista_vacia_no_tiene_siguiente_y_su_elemento_es_null();
+	puedo_recorrer_todos_los_elementos_de_la_lista_con_un_iterador_externo();
 
 	pa2m_nuevo_grupo("Pruebas de iterador interno");
+	no_puedo_usar_iterador_interno_con_funcion_null();
+	no_puedo_usar_iterador_interno_con_lista_null();
+	puedo_usar_iterador_interno_con_contexto_null();
+	puedo_recorrer_toda_la_lista_con_iterador_interno();
+	puedo_recorrer_3_elementos_de_una_lista_de_10_elementos_con_iterador_interno();
+	recorrer_lista_vacia_con_iterador_interno_devuelve_0_elementos_iterados();
 
 	pa2m_nuevo_grupo("Pruebas de buscar elemento");
-
-
-	//pa2m_nuevo_grupo("Pruebas de destruir y destruir todo");
-	//destruir_todo_de_lista_null_no_hace_nada();
-	//lista_destruir_no_pierde_memoria();
+	no_puedo_buscar_un_elemento_en_una_lista_null();
+	no_puedo_buscar_un_elemento_en_una_lista_con_comparador_null();
+	buscar_elemento_en_lista_vacia_devuelve_null();
+	buscar_elemento_inexistente_en_lista_devuelve_null();
+	buscar_elemento_existente_en_lista_devuelve_el_elemento();
 
 	pa2m_nuevo_grupo("Pruebas de tamaño y lista vacia");
 	una_lista_null_esta_vacia();
@@ -389,9 +573,18 @@ int main() {
 	insertar_en_posicion_luego_de_quitar_de_posicion_actualiza_el_tamanio_correctamente();
 
 	pa2m_nuevo_grupo("Pruebas de TDA Cola");
-	
+	pa2m_nuevo_grupo("Pruebas de encolar");
+
+	pa2m_nuevo_grupo("Pruebas de desencolar");
+
+	pa2m_nuevo_grupo("Pruebas de ver frente");
 
 	pa2m_nuevo_grupo("Pruebas de TDA Pila");
+	pa2m_nuevo_grupo("Pruebas de apilar");
+
+	pa2m_nuevo_grupo("Pruebas de desapilar");
+
+	pa2m_nuevo_grupo("Pruebas de ver tope");
 
 
 	return pa2m_mostrar_reporte();
