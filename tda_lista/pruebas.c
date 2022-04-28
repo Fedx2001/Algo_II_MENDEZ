@@ -341,18 +341,16 @@ void no_puedo_usar_iterador_interno_con_funcion_null()
 	lista_destruir(lista);
 }
 
-bool es_par(void *n, void *contexto)
+
+bool _es_par(void *numero, void *contexto)
 {
-	int elemento = *(int *)n;
-	if(elemento%2==0)
-		return true;
-	return false;
+	return *(int *)numero%2==0 ? true : false;
 }
 
 void no_puedo_usar_iterador_interno_con_lista_null()
 {
 	int contexto = 2;
-	pa2m_afirmar(lista_con_cada_elemento(NULL, es_par, &contexto)==0, "No puedo usar el interador interno con lista NULL");
+	pa2m_afirmar(lista_con_cada_elemento(NULL, _es_par, &contexto)==0, "No puedo usar el interador interno con lista NULL");
 
 }
 
@@ -363,7 +361,7 @@ void puedo_usar_iterador_interno_con_contexto_null()
 	for(int i=0; i<2; i++)
 		lista_insertar(lista, elementos+i);
 
-	pa2m_afirmar(lista_con_cada_elemento(lista, es_par, NULL)!=0, "Puedo usar el interador interno con contexto NULL");
+	pa2m_afirmar(lista_con_cada_elemento(lista, _es_par, NULL)!=0, "Puedo usar el interador interno con contexto NULL");
 
 	lista_destruir(lista);
 }
@@ -375,7 +373,7 @@ void puedo_recorrer_toda_la_lista_con_iterador_interno()
 	for(int i=0; i<3; i++)
 		lista_insertar(lista, elementos+i);
 	
-	pa2m_afirmar(lista_con_cada_elemento(lista, es_par, NULL)==3, "Puedo recorrer toda la lista con el iterador interno");
+	pa2m_afirmar(lista_con_cada_elemento(lista, _es_par, NULL)==3, "Puedo recorrer toda la lista con el iterador interno");
 
 	lista_destruir(lista);
 }
@@ -412,7 +410,7 @@ void recorrer_lista_vacia_con_iterador_interno_devuelve_0_elementos_iterados()
 	lista_destruir(lista);
 }
 
-int es_contexto(void *elemento, void *contexto)
+int _es_contexto(void *elemento, void *contexto)
 {
 	return *(int *)elemento == *(int *)contexto ? 0 : -1;
 }
@@ -420,7 +418,7 @@ int es_contexto(void *elemento, void *contexto)
 void no_puedo_buscar_un_elemento_en_una_lista_null()
 {
 	int contexto = 6;
-	pa2m_afirmar(lista_buscar_elemento(NULL, es_contexto, &contexto)==NULL, "No puedo buscar un elemento en una lista NULL");
+	pa2m_afirmar(lista_buscar_elemento(NULL, _es_contexto, &contexto)==NULL, "No puedo buscar un elemento en una lista NULL");
 }
 
 void no_puedo_buscar_un_elemento_en_una_lista_con_comparador_null()
@@ -438,7 +436,7 @@ void buscar_elemento_en_lista_vacia_devuelve_null()
 	int contexto = 6;
 	lista_t *lista = lista_crear();
 
-	pa2m_afirmar(lista_buscar_elemento(lista, es_contexto, &contexto)==NULL, "Buscar un elemento en una lista vacia devuelve NULL");
+	pa2m_afirmar(lista_buscar_elemento(lista, _es_contexto, &contexto)==NULL, "Buscar un elemento en una lista vacia devuelve NULL");
 
 	lista_destruir(lista);
 }
@@ -453,7 +451,7 @@ void buscar_elemento_inexistente_en_lista_devuelve_null()
 		lista_insertar(lista, elementos+i);
 	}
 
-	pa2m_afirmar(lista_buscar_elemento(lista, es_contexto, &a_buscar)==NULL, "Buscar un elemento inexistente en la lista devuelve NULL");
+	pa2m_afirmar(lista_buscar_elemento(lista, _es_contexto, &a_buscar)==NULL, "Buscar un elemento inexistente en la lista devuelve NULL");
 
 	lista_destruir(lista);
 }
@@ -468,7 +466,7 @@ void buscar_elemento_existente_en_lista_devuelve_el_elemento()
 		lista_insertar(lista, elementos+i);
 	}
 
-	pa2m_afirmar(lista_buscar_elemento(lista, es_contexto, &a_buscar)==elementos+3, "Buscar un elemento en la lista devuelve el elemento");
+	pa2m_afirmar(lista_buscar_elemento(lista, _es_contexto, &a_buscar)==elementos+3, "Buscar un elemento en la lista devuelve el elemento");
 
 	lista_destruir(lista);
 }
@@ -483,32 +481,193 @@ void lista_null_tiene_tamanio_0()
 	pa2m_afirmar(lista_tamanio(NULL)==0, "Una lista NULL tiene tamaño 0");
 }
 
-void insertar_en_posicion_luego_de_quitar_de_posicion_actualiza_el_tamanio_correctamente()
+void insertar_en_posicion_y_quitar_de_posicion_actualizan_el_tamanio_correctamente()
 {
 	lista_t *lista = lista_crear();
-	int elementos[1000];
-	for(int i=0; i<1000; i++) {
+	int elementos[500];
+	for(int i=0; i<500; i++) {
 		elementos[i] = i+1;
 		lista_insertar(lista, elementos+i);
 	}
 
-	int elemento = 1001;
+	int elemento = 450;
 
-	pa2m_afirmar(lista_insertar_en_posicion(lista, &elemento, 15)==lista, "Puedo insertar en la posicion 15 en una lista de 1000 elementos");
-	pa2m_afirmar(lista_elemento_en_posicion(lista, 15)==&elemento, "El elemento insertado esta en la posicion correcta");
-	pa2m_afirmar(lista_tamanio(lista)==1001, "El tamaño de la lista ahora es 1001");
-	pa2m_afirmar(lista_quitar_de_posicion(lista, 15)==&elemento, "Quitar el elemento de la posicion 15 me devuelve el elemento");
-	pa2m_afirmar(lista_tamanio(lista)==1000, "El tamaño de la lista es 1000 luego de quitar");
-	for(int i=0; i<3; i++)
-		lista_quitar_de_posicion(lista, (size_t)i*2);
-
-	pa2m_afirmar(lista_tamanio(lista)==997, "El tamaño de la lista es 997 luego de quitar 3 elementos de posiciones");
+	pa2m_afirmar(lista_insertar_en_posicion(lista, &elemento, 69)==lista, "Puedo insertar en la posicion 69 en una lista de 500 elementos");
+	pa2m_afirmar(lista_elemento_en_posicion(lista, 69)==&elemento, "El elemento insertado esta en la posicion correcta");
+	pa2m_afirmar(lista_tamanio(lista)==501, "El tamaño de la lista ahora es 501");
+	pa2m_afirmar(lista_quitar_de_posicion(lista, 69)==&elemento, "Quitar el elemento de la posicion 69 me devuelve el elemento");
+	pa2m_afirmar(lista_tamanio(lista)==500, "El tamaño de la lista es 500 luego de quitar");
+	
+	for(size_t i=0; i<500; i++) {
+		lista_quitar(lista);
+	}
+	
+	pa2m_afirmar(lista_vacia(lista), "Quitar todos los elementos deja la lista vacia");
+	pa2m_afirmar(lista_tamanio(lista)==0, "La lista es de tamaño 0");
 
 	lista_destruir(lista);
 }
 
+void puedo_crear_una_cola_y_su_frente_es_null()
+{
+	cola_t *cola = cola_crear();
+
+	pa2m_afirmar(cola!=NULL, "Puedo crear una cola");
+	pa2m_afirmar(cola_frente(cola)==NULL, "El frente de la cola es NULL");
+
+	cola_destruir(cola);
+}
+
+void una_cola_recien_creada_esta_vacia()
+{
+	cola_t *cola = cola_crear();
+
+	pa2m_afirmar(cola_vacia(cola), "Una cola recien creada esta vacia");
+
+	cola_destruir(cola);
+}
+
+void no_puedo_encolar_en_una_cola_null()
+{
+
+}
+
+void puedo_encolar_en_una_cola_vacia_y_el_frente_es_el_correcto()
+{
+
+}
+
+void encolar_varios_elementos_no_cambia_el_frente()
+{
+
+}
+
+void no_puedo_desencolar_de_una_cola_null()
+{
+
+}
+
+void no_puedo_desencolar_de_una_cola_vacia()
+{
+
+}
+
+void desencolar_devuelve_el_elemento_correcto()
+{
+
+}
+
+void desencolar_varios_elementos_actualiza_el_frente()
+{
+
+}
+
+void desencolar_todos_los_elementos_deja_la_cola_vacia()
+{
+
+}
+
+void desencolar_devuelve_los_elementos_en_el_orden_correcto()
+{
+
+}
+
+void el_frente_de_una_cola_null_es_null()
+{
+
+}
+
+void el_frente_de_una_cola_vacia_es_null()
+{
+
+}
+
+void encolar_y_desencolar_varios_elementos_actualiza_correctamente_el_frente()
+{
+
+}
+
+void puedo_crear_una_pila_y_su_tope_es_null()
+{
+	pila_t *pila = pila_crear();
+
+	pa2m_afirmar(pila!=NULL, "Puedo crear una pila");
+	pa2m_afirmar(pila_tope(pila)==NULL, "El tope de la pila es NULL");
+
+	pila_destruir(pila);
+}
+
+void una_pila_recien_creada_esta_vacia()
+{
+	pila_t *pila = pila_crear();
+
+	pa2m_afirmar(pila_vacia(pila), "Una pila recien creada esta vacia");
+
+	pila_destruir(pila);
+}
+
+void no_puedo_apilar_en_una_pila_null()
+{
+	
+}
+
+void puedo_apilar_en_una_pila_vacia_y_el_tope_es_el_elemento()
+{
+	
+}
+
+void apilar_varios_elementos_actualiza_correctamente_el_tope()
+{
+	
+}
+
+void no_puedo_desapilar_de_una_pila_null()
+{
+	
+}
+
+void no_puedo_desapilar_de_una_pila_vacia()
+{
+	
+}
+
+void desapilar_de_una_pila_devuelve_el_elemento()
+{
+	
+}
+
+void desapilar_varios_elementos_actualiza_el_tope_correctamente()
+{
+	
+}
+
+void desapilar_todos_los_elementos_deja_la_pila_vacia()
+{
+	
+}
+
+void desapilar_devuelve_los_elementos_en_el_orden_correcto()
+{
+	
+}
+
+void el_tope_de_una_pila_null_es_null()
+{
+	
+}
+
+void el_tope_de_una_pila_vacia_es_null()
+{
+	
+}
+
+void apilar_y_desapilar_varios_elementos_actualiza_correctamente_el_tope()
+{
+	
+}
+
 int main() {
-	pa2m_nuevo_grupo("Pruebas de TDA Lista");
+	pa2m_nuevo_grupo("< PRUEBAS DE TDA LISTA >");
 	pa2m_nuevo_grupo("Pruebas de creacion de lista");
 	crear_lista_devuelve_una_lista_vacia_de_tamanio_0_y_su_nodo_inicio_y_fin_son_null();
 
@@ -570,22 +729,53 @@ int main() {
 	pa2m_nuevo_grupo("Pruebas de tamaño y lista vacia");
 	una_lista_null_esta_vacia();
 	lista_null_tiene_tamanio_0();
-	insertar_en_posicion_luego_de_quitar_de_posicion_actualiza_el_tamanio_correctamente();
+	insertar_en_posicion_y_quitar_de_posicion_actualizan_el_tamanio_correctamente();
 
-	pa2m_nuevo_grupo("Pruebas de TDA Cola");
+	pa2m_nuevo_grupo("< PRUEBAS DE TDA COLA >");
+	pa2m_nuevo_grupo("Pruebas de creacion");
+	puedo_crear_una_cola_y_su_frente_es_null();
+	una_cola_recien_creada_esta_vacia();
+
 	pa2m_nuevo_grupo("Pruebas de encolar");
+	no_puedo_encolar_en_una_cola_null();
+	puedo_encolar_en_una_cola_vacia_y_el_frente_es_el_correcto();
+	encolar_varios_elementos_no_cambia_el_frente();
 
 	pa2m_nuevo_grupo("Pruebas de desencolar");
+	no_puedo_desencolar_de_una_cola_null();
+	no_puedo_desencolar_de_una_cola_vacia();
+	desencolar_devuelve_el_elemento_correcto();
+	desencolar_varios_elementos_actualiza_el_frente();
+	desencolar_todos_los_elementos_deja_la_cola_vacia();
+	desencolar_devuelve_los_elementos_en_el_orden_correcto();
 
-	pa2m_nuevo_grupo("Pruebas de ver frente");
+	pa2m_nuevo_grupo("Pruebas de ver frente y destruir");
+	el_frente_de_una_cola_null_es_null();
+	el_frente_de_una_cola_vacia_es_null();
+	encolar_y_desencolar_varios_elementos_actualiza_correctamente_el_frente();
 
-	pa2m_nuevo_grupo("Pruebas de TDA Pila");
+	pa2m_nuevo_grupo("< PRUEBAS DE TDA PILA >");
+	pa2m_nuevo_grupo("Pruebas de creacion");
+	puedo_crear_una_pila_y_su_tope_es_null();
+	una_pila_recien_creada_esta_vacia();
+
 	pa2m_nuevo_grupo("Pruebas de apilar");
+	no_puedo_apilar_en_una_pila_null();
+	puedo_apilar_en_una_pila_vacia_y_el_tope_es_el_elemento();
+	apilar_varios_elementos_actualiza_correctamente_el_tope();
 
 	pa2m_nuevo_grupo("Pruebas de desapilar");
+	no_puedo_desapilar_de_una_pila_null();
+	no_puedo_desapilar_de_una_pila_vacia();
+	desapilar_de_una_pila_devuelve_el_elemento();
+	desapilar_varios_elementos_actualiza_el_tope_correctamente();
+	desapilar_todos_los_elementos_deja_la_pila_vacia();
+	desapilar_devuelve_los_elementos_en_el_orden_correcto();
 
-	pa2m_nuevo_grupo("Pruebas de ver tope");
-
+	pa2m_nuevo_grupo("Pruebas de ver tope y destruir");
+	el_tope_de_una_pila_null_es_null();
+	el_tope_de_una_pila_vacia_es_null();
+	apilar_y_desapilar_varios_elementos_actualiza_correctamente_el_tope();
 
 	return pa2m_mostrar_reporte();
 }

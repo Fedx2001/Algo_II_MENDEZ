@@ -2,8 +2,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#define ERROR 0
-
 lista_t *lista_crear()
 {
 	return calloc(1, sizeof(lista_t));
@@ -299,18 +297,17 @@ void lista_iterador_destruir(lista_iterador_t *iterador)
 size_t lista_con_cada_elemento(lista_t *lista, bool (*funcion)(void *, void *),
 			       void *contexto)
 {
-	if(!lista || !funcion)
-		return ERROR;
-
 	size_t cantidad_iterados = 0;
 
-	nodo_t *actual = lista->nodo_inicio;
-	while(actual) {
-		cantidad_iterados++;
-		if(funcion(actual->elemento, contexto) == false)
-			break;
-		actual = actual->siguiente;
-	} 
+	if(lista && funcion) {
+		nodo_t *actual = lista->nodo_inicio;
+		while(actual) {
+			cantidad_iterados++;
+			if(funcion(actual->elemento, contexto) == false)
+				break;
+			actual = actual->siguiente;
+		} 
+	}
 
 	return cantidad_iterados;
 }
