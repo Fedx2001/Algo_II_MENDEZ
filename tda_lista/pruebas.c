@@ -240,7 +240,7 @@ void no_existe_elemento_en_posicion_4_de_una_lista_con_3_elementos()
 	char *elementos[3] = {"ALGORITMOS Y", " ALGOritmos", "¿Te importa este string? a mi no"};
 	for(int i=0; i<3; i++)
 		lista_insertar(lista, elementos+i);
-	
+
 	pa2m_afirmar(lista_elemento_en_posicion(lista, 4)==NULL, "No existe elemento en posicion 4 de una lista con 3 elementos");
 
 	lista_destruir(lista);
@@ -252,7 +252,7 @@ void tras_quitar_el_ultimo_elemento_de_una_lista_con_4_elementos_no_existe_eleme
 	char *elementos[4] = {"Chrono Trigger", "Peaceful Days", "Boss Battle 1", "Corridors of Time"};
 	for(int i=0; i<4; i++)
 		lista_insertar(lista, elementos+i);
-	
+
 	pa2m_afirmar(lista_quitar(lista)==elementos+3, "Quité el ultimo elemento de una lista con 4 elementos");
 	pa2m_afirmar(lista_elemento_en_posicion(lista, 3)==NULL, "Luego de quitar, no existe elemento en la posicion 3");
 
@@ -284,7 +284,7 @@ void crear_un_iterador_externo_de_lista_null_es_un_error()
 void iterador_en_ultimo_elemento_tiene_siguiente_y_el_elemento_actual_es_el_elemento()
 {
 	lista_t *lista = lista_crear();
-	char *elemento = "To Zanarkand"; 
+	char *elemento = "To Zanarkand";
 	lista_insertar(lista, elemento);
 	lista_iterador_t *iterador = lista_iterador_crear(lista);
 
@@ -312,14 +312,14 @@ void puedo_recorrer_todos_los_elementos_de_la_lista_con_un_iterador_externo()
 {
 	lista_t *lista = lista_crear();
 
-	char *elementos[5] = {"Lena Raine", "Nobuo Uematsu", "Yasunori Mitsuda", "Matt Uelmen", "Toby Fox"}; 
+	char *elementos[5] = {"Lena Raine", "Nobuo Uematsu", "Yasunori Mitsuda", "Matt Uelmen", "Toby Fox"};
 	for(int i=0; i<5; i++)
 		lista_insertar(lista, elementos+i);
 
 	lista_iterador_t *iterador = NULL;
 	int contador = 0;
 
-	for(iterador = lista_iterador_crear(lista); 
+	for(iterador = lista_iterador_crear(lista);
 		lista_iterador_tiene_siguiente(iterador);
 		lista_iterador_avanzar(iterador))
 			contador++;
@@ -372,7 +372,7 @@ void puedo_recorrer_toda_la_lista_con_iterador_interno()
 	int elementos[3] = {2, 4, 6};
 	for(int i=0; i<3; i++)
 		lista_insertar(lista, elementos+i);
-	
+
 	pa2m_afirmar(lista_con_cada_elemento(lista, _es_par, NULL)==3, "Puedo recorrer toda la lista con el iterador interno");
 
 	lista_destruir(lista);
@@ -497,11 +497,11 @@ void insertar_en_posicion_y_quitar_de_posicion_actualizan_el_tamanio_correctamen
 	pa2m_afirmar(lista_tamanio(lista)==501, "El tamaño de la lista ahora es 501");
 	pa2m_afirmar(lista_quitar_de_posicion(lista, 69)==&elemento, "Quitar el elemento de la posicion 69 me devuelve el elemento");
 	pa2m_afirmar(lista_tamanio(lista)==500, "El tamaño de la lista es 500 luego de quitar");
-	
+
 	for(size_t i=0; i<500; i++) {
 		lista_quitar(lista);
 	}
-	
+
 	pa2m_afirmar(lista_vacia(lista), "Quitar todos los elementos deja la lista vacia");
 	pa2m_afirmar(lista_tamanio(lista)==0, "La lista es de tamaño 0");
 
@@ -529,62 +529,157 @@ void una_cola_recien_creada_esta_vacia()
 
 void no_puedo_encolar_en_una_cola_null()
 {
+	int elemento = 0;
+	pa2m_afirmar(cola_encolar(NULL, &elemento)==NULL, "No puedo encolar en una cola NULL");
+}
 
+void puedo_encolar_un_elemento_null()
+{
+	cola_t *cola = cola_crear();
+
+	pa2m_afirmar(cola_encolar(cola, NULL), "Puedo encolar un elemento NULL en una cola");
+
+	cola_destruir(cola);
 }
 
 void puedo_encolar_en_una_cola_vacia_y_el_frente_es_el_correcto()
 {
+	cola_t *cola = cola_crear();
+	int elemento = 10123;
 
+	pa2m_afirmar(cola_encolar(cola, &elemento)==cola, "Puedo encolar en una cola vacia");
+
+	pa2m_afirmar(cola_frente(cola)==&elemento, "El frente es el correcto");
+
+	cola_destruir(cola);
 }
 
 void encolar_varios_elementos_no_cambia_el_frente()
 {
+	cola_t *cola = cola_crear();
+	char *elementos[5] = {"Frente", "B", "C", "D", "Fin"};
+	for(int i=0; i<5; i++)
+		cola_encolar(cola, elementos+i);
 
+	pa2m_afirmar(cola_frente(cola)==elementos, "Encolar varios elementos no cambia el frente");
+
+	cola_destruir(cola);
 }
 
 void no_puedo_desencolar_de_una_cola_null()
 {
-
+	pa2m_afirmar(cola_desencolar(NULL)==NULL, "No puedo desencolar de una cola NULL");
 }
 
 void no_puedo_desencolar_de_una_cola_vacia()
 {
+	cola_t *cola = cola_crear();
 
+	pa2m_afirmar(cola_desencolar(cola)==NULL, "No puedo desencolar de una cola vacia");
+
+	cola_destruir(cola);
 }
 
 void desencolar_devuelve_el_elemento_correcto()
 {
+	cola_t *cola = cola_crear();
+	char *elementos[5] = {"Frente", "B", "C", "D", "Fin"};
+	for(int i=0; i<5; i++)
+		cola_encolar(cola, elementos+i);
 
+	pa2m_afirmar(cola_desencolar(cola)==elementos, "Desencolar devuelve el primer elemento de la cola");
+
+	cola_destruir(cola);
 }
 
 void desencolar_varios_elementos_actualiza_el_frente()
 {
+	cola_t *cola = cola_crear();
+	char *elementos[5] = {"Frente", "B", "C", "D", "Fin"};
 
+	for(int i=0; i<5; i++)
+		cola_encolar(cola, elementos+i);
+
+	cola_desencolar(cola);
+	cola_desencolar(cola);
+	cola_desencolar(cola);
+
+	pa2m_afirmar(cola_frente(cola)==elementos+3, "Desencolar varios elementos actualiza el frente");
+
+	cola_destruir(cola);
 }
 
 void desencolar_todos_los_elementos_deja_la_cola_vacia()
 {
+	cola_t *cola = cola_crear();
+	char *elementos[5] = {"A", "B", "C", "D", "E"};
 
+	for(int i=0; i<5; i++)
+		cola_encolar(cola, elementos+i);
+
+	for(int i=0; i<5; i++)
+		cola_desencolar(cola);
+
+	pa2m_afirmar(cola_vacia(cola), "Desencolar todos los elementos deja la lista vacia");
+	pa2m_afirmar(cola_frente(cola)==NULL, "La cola no tiene frente");
+
+	cola_destruir(cola);
 }
 
 void desencolar_devuelve_los_elementos_en_el_orden_correcto()
 {
+	cola_t *cola = cola_crear();
+	char *elementos[6] = {"Algo", "ritmos", " ", "Y", " ", "Programacion"};
+	bool elementos_estan_ordenados = true;
 
+	for(int i=0; i<6; i++)
+		cola_encolar(cola, elementos+i);
+
+	for(int i=0; i<6; i++) {
+		if(cola_desencolar(cola)!=elementos+i) {
+			elementos_estan_ordenados = false;
+			break;
+		}
+	}
+
+	pa2m_afirmar(elementos_estan_ordenados, "Desencolar devuelve los elementos en el orden correcto");
+
+	cola_destruir(cola);
 }
 
 void el_frente_de_una_cola_null_es_null()
 {
-
+	pa2m_afirmar(cola_frente(NULL)==NULL, "El frente de una cola NULL es NULL");
 }
 
 void el_frente_de_una_cola_vacia_es_null()
 {
+	cola_t *cola = cola_crear();
 
+	pa2m_afirmar(cola_frente(cola)==NULL, "El frente de una cola vacia es NULL");
+
+	cola_destruir(cola);
 }
 
 void encolar_y_desencolar_varios_elementos_actualiza_correctamente_el_frente()
 {
+	cola_t *cola = cola_crear();
+	char *elementos[6] = {"Algo", "ritmos", "22222", "Y", "22222", "Programacion"};
 
+	for(int i=0; i<6; i++)
+		cola_encolar(cola, elementos+i);
+
+	for(int i=0; i<3; i++)
+		cola_desencolar(cola);
+
+	pa2m_afirmar(cola_frente(cola)==elementos+3, "Desencolo 3 elementos de una cola con 6 elementos y el frente es el correcto");
+
+	cola_encolar(cola, elementos);
+	cola_encolar(cola, elementos+1);
+
+	pa2m_afirmar(cola_frente(cola)==elementos+3, "Encolo 2 elementos y el frente no cambia");
+
+	cola_destruir(cola);
 }
 
 void puedo_crear_una_pila_y_su_tope_es_null()
@@ -608,62 +703,164 @@ void una_pila_recien_creada_esta_vacia()
 
 void no_puedo_apilar_en_una_pila_null()
 {
-	
+	int elemento = 0;
+	pa2m_afirmar(pila_apilar(NULL, &elemento)==NULL, "No puedo apilar en una pila NULL");
+}
+
+void puedo_apilar_un_elemento_null()
+{
+	pila_t *pila = pila_crear();
+
+	pa2m_afirmar(pila_apilar(pila, NULL)==pila, "Puedo apilar un elemento NULL");
+
+	pila_destruir(pila);
 }
 
 void puedo_apilar_en_una_pila_vacia_y_el_tope_es_el_elemento()
 {
-	
+	pila_t *pila = pila_crear();
+	char letra = 'a';
+
+	pila_apilar(pila, &letra);
+
+	pa2m_afirmar(pila_tope(pila)==&letra, "Puedo apilar en una pila vacia y el tope es el elemento");
+
+	pila_destruir(pila);
 }
 
 void apilar_varios_elementos_actualiza_correctamente_el_tope()
 {
-	
+	pila_t *pila = pila_crear();
+	char letras[10] = {'a', 'l', 'g', 'o', 'r', 'i', 't', 'm', 'o', 's'};
+
+	for(int i=9; i>=0; i--)
+		pila_apilar(pila, letras+i);
+
+	pa2m_afirmar(pila_tope(pila)==letras, "Apilar varios elementos actualiza el tope");
+
+	pila_destruir(pila);
 }
 
 void no_puedo_desapilar_de_una_pila_null()
 {
-	
+	pa2m_afirmar(pila_desapilar(NULL)==NULL, "No puedo desapilar de una pila NULL");
 }
 
 void no_puedo_desapilar_de_una_pila_vacia()
 {
-	
+	pila_t *pila = pila_crear();
+
+	pa2m_afirmar(pila_desapilar(pila)==NULL, "No puedo desapilar de una pila vacia");
+
+	pila_destruir(pila);
 }
 
-void desapilar_de_una_pila_devuelve_el_elemento()
+void desapilar_de_una_pila_devuelve_el_elemento_y_actualiza_el_tope()
 {
-	
+	pila_t *pila = pila_crear();
+	char letras[10] = {'a', 'l', 'g', 'o', 'r', 'i', 't', 'm', 'o', 's'};
+
+	for(int i=9; i>=0; i--)
+		pila_apilar(pila, letras+i);
+
+	pa2m_afirmar(pila_desapilar(pila)==letras, "Desapilar de una pila devuelve el elemento correcto");
+	pa2m_afirmar(pila_tope(pila)==letras+1, "Se actualizo el tope al siguiente elemento");
+
+	pila_destruir(pila);
 }
 
 void desapilar_varios_elementos_actualiza_el_tope_correctamente()
 {
-	
+	pila_t *pila = pila_crear();
+	char letras[10] = {'a', 'l', 'g', 'o', 'r', 'i', 't', 'm', 'o', 's'};
+
+	for(int i=9; i>=0; i--)
+		pila_apilar(pila, letras+i);
+
+	for(int i=0; i<4; i++)
+		pila_desapilar(pila);
+
+	pa2m_afirmar(pila_tope(pila)==letras+4, "Desapilar varios elementos actualiza el tope al elemento correcto");
+
+	pila_destruir(pila);
 }
 
 void desapilar_todos_los_elementos_deja_la_pila_vacia()
 {
-	
+	pila_t *pila = pila_crear();
+	char letras[10] = {'a', 'l', 'g', 'o', 'r', 'i', 't', 'm', 'o', 's'};
+
+	for(int i=9; i>=0; i--)
+		pila_apilar(pila, letras+i);
+
+	for(int i=0; i<10; i++)
+		pila_desapilar(pila);
+
+	pa2m_afirmar(pila_vacia(pila), "Desapilar todos los elementos deja la pila vacia");
+	pa2m_afirmar(pila_tope(pila)==NULL, "El tope de la pila es NULL");
+
+	pila_destruir(pila);
 }
 
 void desapilar_devuelve_los_elementos_en_el_orden_correcto()
 {
-	
+	pila_t *pila = pila_crear();
+	char letras[15] = {'F', 'i', 'n', 'a', 'l', ' ', 'F', 'a', 'n', 't', 'a', 's', 'y', ' ', 'I'};
+	bool elementos_estan_ordenados = true;
+
+	for(int i=14; i>=0; i--)
+		pila_apilar(pila, letras+i);
+
+	for(int i=0; i<15; i++) {
+		if(pila_desapilar(pila)!=letras+i)
+			elementos_estan_ordenados = false;
+	}
+
+	pa2m_afirmar(elementos_estan_ordenados, "Desapilar devuelve los elementos en el orden correcto");
+
+	pila_destruir(pila);
 }
 
 void el_tope_de_una_pila_null_es_null()
 {
-	
+	pa2m_afirmar(pila_tope(NULL)==NULL, "El tope de una pila NULL es NULL");
 }
 
 void el_tope_de_una_pila_vacia_es_null()
 {
-	
+	pila_t *pila = pila_crear();
+
+	pa2m_afirmar(pila_tope(pila)==NULL, "El tope de una pila vacia es NULL");
+
+	pila_destruir(pila);
 }
 
 void apilar_y_desapilar_varios_elementos_actualiza_correctamente_el_tope()
 {
-	
+	pila_t *pila = pila_crear();
+	char *canciones[10] = {
+		"Turnabout Squeeze", "Out of Tartarus", "Dr. Willy's Castle", 
+		"To the Moon", "NOW'S YOUR CHANCE TO BE A", "Smart Race", 
+		"Wake up, Get up, Get out there", "Prelude/Prologue (FF I)", 
+		"Lucca's Theme", "Green Hill Zone"
+	};
+
+	for(int i=9; i>=0; i--)
+		pila_apilar(pila, canciones+i);
+
+	for(int i=0; i<4; i++) {
+		pila_desapilar(pila);
+	}
+
+	pa2m_afirmar(pila_tope(pila)==canciones+4, "Desapilo 4 elementos de una pila con 10 elementos y el tope es el correcto");
+
+	pila_apilar(pila, canciones+1);
+	pila_apilar(pila, canciones+2);
+	pila_apilar(pila, canciones);
+
+	pa2m_afirmar(pila_tope(pila)==canciones, "Apilo 3 elementos y el nuevo tope es el correcto");
+
+	pila_destruir(pila);
 }
 
 int main() {
@@ -677,7 +874,7 @@ int main() {
 	puedo_insertar_un_elemento_null_en_la_lista_y_se_actualizan_el_tamanio_el_incio_y_el_fin();
 	insertar_en_lista_con_un_elemento_actualiza_el_fin_y_no_altera_el_incio();
 	insertar_en_lista_con_mas_de_un_elemento_actualiza_el_fin();
-	
+
 	pa2m_nuevo_grupo("Pruebas de quitar al final");
 	no_puedo_quitar_elemento_en_lista_null();
 	no_puedo_quitar_elemento_en_lista_vacia();
@@ -740,6 +937,7 @@ int main() {
 	no_puedo_encolar_en_una_cola_null();
 	puedo_encolar_en_una_cola_vacia_y_el_frente_es_el_correcto();
 	encolar_varios_elementos_no_cambia_el_frente();
+	puedo_encolar_un_elemento_null();
 
 	pa2m_nuevo_grupo("Pruebas de desencolar");
 	no_puedo_desencolar_de_una_cola_null();
@@ -763,11 +961,12 @@ int main() {
 	no_puedo_apilar_en_una_pila_null();
 	puedo_apilar_en_una_pila_vacia_y_el_tope_es_el_elemento();
 	apilar_varios_elementos_actualiza_correctamente_el_tope();
+	puedo_apilar_un_elemento_null();
 
 	pa2m_nuevo_grupo("Pruebas de desapilar");
 	no_puedo_desapilar_de_una_pila_null();
 	no_puedo_desapilar_de_una_pila_vacia();
-	desapilar_de_una_pila_devuelve_el_elemento();
+	desapilar_de_una_pila_devuelve_el_elemento_y_actualiza_el_tope();
 	desapilar_varios_elementos_actualiza_el_tope_correctamente();
 	desapilar_todos_los_elementos_deja_la_pila_vacia();
 	desapilar_devuelve_los_elementos_en_el_orden_correcto();
