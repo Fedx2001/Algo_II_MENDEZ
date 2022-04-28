@@ -947,7 +947,7 @@ int main() {
 	desencolar_todos_los_elementos_deja_la_cola_vacia();
 	desencolar_devuelve_los_elementos_en_el_orden_correcto();
 
-	pa2m_nuevo_grupo("Pruebas de ver frente y destruir");
+	pa2m_nuevo_grupo("Pruebas de ver frente");
 	el_frente_de_una_cola_null_es_null();
 	el_frente_de_una_cola_vacia_es_null();
 	encolar_y_desencolar_varios_elementos_actualiza_correctamente_el_frente();
@@ -971,7 +971,7 @@ int main() {
 	desapilar_todos_los_elementos_deja_la_pila_vacia();
 	desapilar_devuelve_los_elementos_en_el_orden_correcto();
 
-	pa2m_nuevo_grupo("Pruebas de ver tope y destruir");
+	pa2m_nuevo_grupo("Pruebas de ver tope");
 	el_tope_de_una_pila_null_es_null();
 	el_tope_de_una_pila_vacia_es_null();
 	apilar_y_desapilar_varios_elementos_actualiza_correctamente_el_tope();
