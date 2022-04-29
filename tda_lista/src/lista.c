@@ -2,8 +2,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#define ERROR 0
 #define EXITO 0
+#define ERROR 0
 
 lista_t *lista_crear()
 {
