@@ -2,6 +2,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#define ERROR 0
+#define EXITO 0
+
 lista_t *lista_crear()
 {
 	return calloc(1, sizeof(lista_t));
@@ -161,7 +164,7 @@ void *lista_buscar_elemento(lista_t *lista, int (*comparador)(void *, void *),
 
 	nodo_t *actual = lista->nodo_inicio;
 	while(actual) {
-		if(comparador((actual->elemento), contexto) == 0)
+		if(comparador((actual->elemento), contexto) == EXITO)
 			return actual->elemento;
 
 		actual = actual->siguiente;
@@ -197,7 +200,7 @@ bool lista_vacia(lista_t *lista)
 size_t lista_tamanio(lista_t *lista)
 {
 	if(!lista)
-		return 0;
+		return ERROR;
 
 	return lista->cantidad;
 }
