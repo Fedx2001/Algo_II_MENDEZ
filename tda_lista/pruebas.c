@@ -508,6 +508,21 @@ void insertar_en_posicion_y_quitar_de_posicion_actualizan_el_tamanio_correctamen
 	lista_destruir(lista);
 }
 
+void destruir_todo_con_funcion_null_no_destruye_elementos()
+{
+	int *elemento = malloc(sizeof(int));
+	*elemento = 123123;
+
+	lista_t *lista = lista_crear();
+	lista_insertar(lista, elemento);
+
+	lista_destruir_todo(lista, NULL);
+
+	pa2m_afirmar(elemento, "Destruir todo con funcion NULL no destruye elementos");
+
+	free(elemento);
+}
+
 void puedo_crear_una_cola_y_su_frente_es_null()
 {
 	cola_t *cola = cola_crear();
@@ -927,6 +942,9 @@ int main() {
 	una_lista_null_esta_vacia();
 	lista_null_tiene_tamanio_0();
 	insertar_en_posicion_y_quitar_de_posicion_actualizan_el_tamanio_correctamente();
+
+	pa2m_nuevo_grupo("Prueba de destruir todo");
+	destruir_todo_con_funcion_null_no_destruye_elementos();
 
 	pa2m_nuevo_grupo("< PRUEBAS DE TDA COLA >");
 	pa2m_nuevo_grupo("Pruebas de creacion");

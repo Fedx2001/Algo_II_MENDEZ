@@ -142,6 +142,11 @@ void *lista_elemento_en_posicion(lista_t *lista, size_t posicion)
 	if(posicion >= lista_tamanio(lista))
 		return NULL;
 
+	if(posicion == 0)
+		return lista_primero(lista);
+	else if(posicion == lista_tamanio(lista)-1)
+		return lista_ultimo(lista);
+
 	nodo_t *nodo = lista->nodo_inicio;
 	for(int i=0; i<posicion; i++) {
 		nodo = nodo->siguiente;
