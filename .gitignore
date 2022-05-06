@@ -1,4 +1,5 @@
 .vscode
 *.out
 *.o
+*.zip
 tp1_escape_pokemon/comms
