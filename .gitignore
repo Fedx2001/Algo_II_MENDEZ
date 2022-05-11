@@ -3,3 +3,4 @@
 *.o
 *.zip
 tp1_escape_pokemon/comms
+.DS_Store
