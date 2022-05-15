@@ -129,6 +129,7 @@ void no_puedo_quitar_de_un_abb_null()
 
 bool seguir_recorriendo(void *elemento, void *aux)
 {
+	lista_insertar((lista_t *)aux, elemento);
 	if(elemento != aux)
 		return true;
 	return false;
@@ -143,9 +144,16 @@ void iterador_interno_con_recorrido_postorden_hasta_encontrar_el_10_recorre_los_
 	for(int i=0; i<7; i++)
 		abb_insertar(arbol, elementos+i);
 
-	abb_con_cada_elemento(arbol, POSTORDEN, seguir_recorriendo, elementos+6);
+	lista_t *elementos_recorridos = lista_crear();
+
+	abb_con_cada_elemento(arbol, POSTORDEN, seguir_recorriendo, elementos_recorridos);
 	// abb_con_cada_elemento(arbol, INORDEN, seguir_recorriendo, lista_elementos);
 	// abb_con_cada_elemento(arbol, PREORDEN, seguir_recorriendo, lista_elementos);
+
+	bool condicion = elementos_recorridos->nodo_inicio->elemento == elementos+6 && elementos_recorridos->nodo_fin->siguiente == NULL;
+	pa2m_afirmar(condicion == true, "Iterador interno con recorrido postorden recorre correctamente el arbol hasta encontrar el valor especificado");
+
+	lista_destruir(elementos_recorridos);
 
 	abb_destruir(arbol);
 }
