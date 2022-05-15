@@ -127,15 +127,25 @@ void no_puedo_quitar_de_un_abb_null()
 	pa2m_afirmar(abb_quitar(NULL, &elemento) == NULL, "No puedo quitar un elemento de un abb NULL");
 }
 
+void no_puedo_quitar_de_un_abb_vacio()
+{
+	abb_t *arbol = abb_crear(comparar_enteros);
+
+	char elemento = 123;
+
+	pa2m_afirmar(abb_quitar(arbol, &elemento) == NULL, "No puedo quitar un elemento de un abb vacio");
+
+	abb_destruir(arbol);
+}
+
 bool seguir_recorriendo(void *elemento, void *aux)
 {
-	lista_insertar((lista_t *)aux, elemento);
 	if(elemento != aux)
 		return true;
 	return false;
 }
 
-void iterador_interno_con_recorrido_postorden_hasta_encontrar_el_10_recorre_los_elementos_correctos()
+void con_cada_elemento_con_recorrido_postorden_hasta_encontrar_el_10_invoca_a_la_funcion_una_sola_vez()
 {
 	abb_t *arbol = abb_crear(comparar_enteros);
 
@@ -144,16 +154,41 @@ void iterador_interno_con_recorrido_postorden_hasta_encontrar_el_10_recorre_los_
 	for(int i=0; i<7; i++)
 		abb_insertar(arbol, elementos+i);
 
-	lista_t *elementos_recorridos = lista_crear();
+	size_t veces_invocada = abb_con_cada_elemento(arbol, POSTORDEN, seguir_recorriendo, elementos+6);
 
-	abb_con_cada_elemento(arbol, POSTORDEN, seguir_recorriendo, elementos_recorridos);
-	// abb_con_cada_elemento(arbol, INORDEN, seguir_recorriendo, lista_elementos);
-	// abb_con_cada_elemento(arbol, PREORDEN, seguir_recorriendo, lista_elementos);
+	pa2m_afirmar(veces_invocada == 1, "It. interno con recorrido postorden hasta el 10 invoca a la funcion una vez");
 
-	bool condicion = elementos_recorridos->nodo_inicio->elemento == elementos+6 && elementos_recorridos->nodo_fin->siguiente == NULL;
-	pa2m_afirmar(condicion == true, "Iterador interno con recorrido postorden recorre correctamente el arbol hasta encontrar el valor especificado");
+	abb_destruir(arbol);
+}
 
-	lista_destruir(elementos_recorridos);
+void con_cada_elemento_con_recorrido_preorden_hasta_encontrar_el_10_invoca_a_la_funcion_cuatro_veces()
+{
+	abb_t *arbol = abb_crear(comparar_enteros);
+
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(arbol, elementos+i);
+
+	size_t veces_invocada = abb_con_cada_elemento(arbol, PREORDEN, seguir_recorriendo, elementos+6);
+
+	pa2m_afirmar(veces_invocada == 4, "It. interno con recorrido preorden hasta el 10 invoca a la funcion cuatro veces");
+
+	abb_destruir(arbol);
+}
+
+void con_cada_elemento_con_recorrido_inorden_hasta_encontrar_el_10_invoca_a_la_funcion_dos_veces()
+{
+	abb_t *arbol = abb_crear(comparar_enteros);
+
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(arbol, elementos+i);
+
+	size_t veces_invocada = abb_con_cada_elemento(arbol, INORDEN, seguir_recorriendo, elementos+6);
+
+	pa2m_afirmar(veces_invocada == 2, "It. interno con recorrido inorden hasta el 10 invoca a la funcion dos veces");
 
 	abb_destruir(arbol);
 }
@@ -175,6 +210,7 @@ int main()
 
 	pa2m_nuevo_grupo("Pruebas de Eliminación");
 	no_puedo_quitar_de_un_abb_null();
+	no_puedo_quitar_de_un_abb_vacio();
 
 	pa2m_nuevo_grupo("Pruebas de Busqueda");
 
@@ -184,7 +220,9 @@ int main()
 
 
 	pa2m_nuevo_grupo("Pruebas de iterador interno");
-	iterador_interno_con_recorrido_postorden_hasta_encontrar_el_10_recorre_los_elementos_correctos();
+	con_cada_elemento_con_recorrido_postorden_hasta_encontrar_el_10_invoca_a_la_funcion_una_sola_vez();
+	con_cada_elemento_con_recorrido_preorden_hasta_encontrar_el_10_invoca_a_la_funcion_cuatro_veces();
+	con_cada_elemento_con_recorrido_inorden_hasta_encontrar_el_10_invoca_a_la_funcion_dos_veces();
 
 	pa2m_nuevo_grupo("Pruebas de");
 
