@@ -96,19 +96,19 @@ void insertar_varios_elementos_inserta_en_las_posiciones_correctas()
 
 	if(arbol->nodo_raiz->elemento != elementos+0)
 		orden_correcto = false;
-	
+
 	if(arbol->nodo_raiz->izquierda->elemento != elementos+2)
 		orden_correcto = false;
-	
+
 	if(arbol->nodo_raiz->izquierda->izquierda->elemento != elementos+4)
 		orden_correcto = false;
-	
+
 	if(arbol->nodo_raiz->izquierda->derecha->elemento != elementos+5)
 		orden_correcto = false;
-	
+
 	if(arbol->nodo_raiz->derecha->elemento != elementos+1)
 		orden_correcto = false;
-	
+
 	if(arbol->nodo_raiz->derecha->izquierda->elemento != elementos+3)
 		orden_correcto = false;
 
@@ -134,6 +134,161 @@ void no_puedo_quitar_de_un_abb_vacio()
 	char elemento = 123;
 
 	pa2m_afirmar(abb_quitar(arbol, &elemento) == NULL, "No puedo quitar un elemento de un abb vacio");
+
+	abb_destruir(arbol);
+}
+
+void quitar_la_raiz_en_un_abb_con_un_solo_elemento_deja_al_abb_vacio_y_con_tamanio_0()
+{
+	abb_t *arbol = abb_crear(comparar_enteros);
+
+	int elemento = 100;
+	arbol = abb_insertar(arbol, &elemento);
+
+	pa2m_afirmar(abb_quitar(arbol, &elemento) == &elemento, "Puedo quitar la raiz de un abb con un elemento");
+	pa2m_afirmar(abb_tamanio(arbol) == 0, "El tamanio del abb luego de quitar es 0");
+	pa2m_afirmar(abb_vacio(arbol) == true, "El arbol esta vacio luego de quitar");
+
+	abb_destruir(arbol);
+}
+
+void quitar_un_nodo_hoja_actualiza_correctamente_el_arbol()
+{
+	abb_t *arbol = abb_crear(comparar_enteros);
+
+	int elementos[4] = {24,326,10,9};
+	for(int i=0; i<4; i++)
+		abb_insertar(arbol, elementos+i);
+
+	int *quitado = abb_quitar(arbol, elementos+3);
+
+	bool orden_correcto = true;
+	if(arbol->nodo_raiz->elemento != elementos+0)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->derecha->elemento != elementos+1)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->elemento != elementos+2)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->izquierda != NULL)
+		orden_correcto = false;
+
+	pa2m_afirmar(quitado == elementos+1, "Se quitó un elemento sin hijos");
+	pa2m_afirmar(orden_correcto == true, "El arbol esta correctamente formado");
+	pa2m_afirmar(arbol->nodo_raiz->derecha->elemento == elementos+3, "Luego de quitar el hijo queda en lugar del elemento quitado");
+
+	abb_destruir(arbol);
+}
+
+void quitar_un_nodo_con_hijo_derecho_actualiza_correctamente_los_nodos_y_el_tamanio()
+{
+	abb_t *arbol = abb_crear(comparar_enteros);
+
+	int elementos[6] = {24,99,12,100,1,15};
+	for(int i=0; i<6; i++)
+		abb_insertar(arbol, elementos+i);
+
+	int *quitado = abb_quitar(arbol, elementos+1);
+
+	bool orden_correcto = true;
+	if(arbol->nodo_raiz->elemento != elementos+0)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->derecha->elemento != elementos+3)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->elemento != elementos+2)
+		orden_correcto = false;
+	
+	if(arbol->nodo_raiz->derecha->derecha != NULL)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->izquierda->elemento != elementos+4)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->derecha->elemento != elementos+5)
+		orden_correcto = false;
+
+	pa2m_afirmar(quitado == elementos+1, "Se quitó un elemento con hijo derecho");
+	pa2m_afirmar(arbol->nodo_raiz->derecha->elemento == elementos+3, "Luego de quitar el hijo queda en lugar del elemento quitado");
+	pa2m_afirmar(abb_tamanio(arbol) == 5, "El tamaño se actualiza correctamente");
+	pa2m_afirmar(orden_correcto == true, "El arbol esta correctamente formado");
+
+	abb_destruir(arbol);
+}
+
+void quitar_un_nodo_con_hijo_izquierdo_actualiza_correctamente_los_nodos_y_el_tamanio()
+{
+	abb_t *arbol = abb_crear(comparar_enteros);
+
+	int elementos[6] = {24,99,12,98,1,15};
+	for(int i=0; i<6; i++)
+		abb_insertar(arbol, elementos+i);
+
+	int *quitado = abb_quitar(arbol, elementos+1);
+
+	bool orden_correcto = true;
+	if(arbol->nodo_raiz->elemento != elementos+0)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->derecha->elemento != elementos+3)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->elemento != elementos+2)
+		orden_correcto = false;
+	
+	if(arbol->nodo_raiz->derecha->izquierda != NULL)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->izquierda->elemento != elementos+4)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->derecha->elemento != elementos+5)
+		orden_correcto = false;
+
+	pa2m_afirmar(quitado == elementos+1, "Se quitó un elemento con hijo izquierdo");
+	pa2m_afirmar(arbol->nodo_raiz->derecha->elemento == elementos+3, "Luego de quitar el hijo queda en lugar del elemento quitado");
+	pa2m_afirmar(abb_tamanio(arbol) == 5, "El tamaño se actualiza correctamente");
+	pa2m_afirmar(orden_correcto == true, "El arbol esta correctamente formado");
+
+	abb_destruir(arbol);
+}
+
+void quitar_un_nodo_con_hijos_a_ambos_lados_actualiza_correctamente_los_nodos_y_el_tamanio()
+{
+	abb_t *arbol = abb_crear(comparar_enteros);
+
+	int elementos[6] = {24,99,12,100,1,15};
+	for(int i=0; i<6; i++)
+		abb_insertar(arbol, elementos+i);
+
+	int *quitado = abb_quitar(arbol, elementos+2);
+
+	bool orden_correcto = true;
+	if(arbol->nodo_raiz->elemento != elementos+0)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->derecha->elemento != elementos+1)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->elemento != elementos+4)
+		orden_correcto = false;
+	
+	if(arbol->nodo_raiz->derecha->derecha->elemento != elementos+3)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->izquierda != NULL)
+		orden_correcto = false;
+
+	if(arbol->nodo_raiz->izquierda->derecha->elemento != elementos+5)
+		orden_correcto = false;
+
+	pa2m_afirmar(quitado == elementos+2, "Se quitó un elemento con hijos a ambos lados");
+	pa2m_afirmar(arbol->nodo_raiz->izquierda->elemento == elementos+4, "Luego de quitar, el predecesor inorden queda en lugar del elemento quitado");
+	pa2m_afirmar(abb_tamanio(arbol) == 5, "El tamaño se actualiza correctamente");
+	pa2m_afirmar(orden_correcto == true, "El arbol esta correctamente formado");
 
 	abb_destruir(arbol);
 }
@@ -211,13 +366,19 @@ int main()
 	pa2m_nuevo_grupo("Pruebas de Eliminación");
 	no_puedo_quitar_de_un_abb_null();
 	no_puedo_quitar_de_un_abb_vacio();
+	quitar_la_raiz_en_un_abb_con_un_solo_elemento_deja_al_abb_vacio_y_con_tamanio_0();
+	quitar_un_nodo_con_hijo_derecho_actualiza_correctamente_los_nodos_y_el_tamanio();
+	quitar_un_nodo_con_hijo_izquierdo_actualiza_correctamente_los_nodos_y_el_tamanio();
+	quitar_un_nodo_con_hijos_a_ambos_lados_actualiza_correctamente_los_nodos_y_el_tamanio();
 
 	pa2m_nuevo_grupo("Pruebas de Busqueda");
+	// no_puedo_buscar_en_abb_nulo();
+	// buscar_un_elemento_que_no_existe_en_el_abb_devuelve_null();
 
 	pa2m_nuevo_grupo("Inserción, borrado y búsqueda sobre el mismo árbol");
 
 	pa2m_nuevo_grupo("Pruebas de recorridos");
-
+	// recorrer
 
 	pa2m_nuevo_grupo("Pruebas de iterador interno");
 	con_cada_elemento_con_recorrido_postorden_hasta_encontrar_el_10_invoca_a_la_funcion_una_sola_vez();

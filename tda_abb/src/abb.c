@@ -140,7 +140,7 @@ void *abb_buscar(abb_t *arbol, void *elemento)
 
 bool abb_vacio(abb_t *arbol)
 {
-	if(arbol && arbol->nodo_raiz)
+	if(arbol && !arbol->nodo_raiz)
 		return true;
 
 	return false;
@@ -259,12 +259,14 @@ void _recorrido_inorden(nodo_abb_t *actual, void **array, size_t tamanio_array, 
 
 void _recorrido_postorden(nodo_abb_t *actual, void **array, size_t tamanio_array, size_t *elementos_guardados)
 {
-	if(!actual || *elementos_guardados >= tamanio_array)
+	if(!actual)
 		return;
 
 	_recorrido_inorden(actual->izquierda, array, tamanio_array, elementos_guardados);
 	_recorrido_inorden(actual->derecha, array, tamanio_array, elementos_guardados);
 	
+	if(*elementos_guardados >= tamanio_array)
+		return;
 	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
