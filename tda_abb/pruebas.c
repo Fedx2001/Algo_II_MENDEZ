@@ -1,4 +1,5 @@
 #include "src/abb.h"
+#include "src/lista.h"
 #include <stdio.h>
 #include "pa2mm.h"
 #include "string.h"
@@ -126,6 +127,29 @@ void no_puedo_quitar_de_un_abb_null()
 	pa2m_afirmar(abb_quitar(NULL, &elemento) == NULL, "No puedo quitar un elemento de un abb NULL");
 }
 
+bool seguir_recorriendo(void *elemento, void *aux)
+{
+	if(elemento != aux)
+		return true;
+	return false;
+}
+
+void iterador_interno_con_recorrido_postorden_hasta_encontrar_el_10_recorre_los_elementos_correctos()
+{
+	abb_t *arbol = abb_crear(comparar_enteros);
+
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(arbol, elementos+i);
+
+	abb_con_cada_elemento(arbol, POSTORDEN, seguir_recorriendo, elementos+6);
+	// abb_con_cada_elemento(arbol, INORDEN, seguir_recorriendo, lista_elementos);
+	// abb_con_cada_elemento(arbol, PREORDEN, seguir_recorriendo, lista_elementos);
+
+	abb_destruir(arbol);
+}
+
 int main()
 {
 	pa2m_nuevo_grupo("Pruebas de ABB");
@@ -149,8 +173,12 @@ int main()
 	pa2m_nuevo_grupo("Inserción, borrado y búsqueda sobre el mismo árbol");
 
 	pa2m_nuevo_grupo("Pruebas de recorridos");
-	pa2m_nuevo_grupo("Pruebas de abb_con_cada_elemento");
-	pa2m_nuevo_grupo("");
+
+
+	pa2m_nuevo_grupo("Pruebas de iterador interno");
+	iterador_interno_con_recorrido_postorden_hasta_encontrar_el_10_recorre_los_elementos_correctos();
+
+	pa2m_nuevo_grupo("Pruebas de");
 
 	return pa2m_mostrar_reporte();
 }
