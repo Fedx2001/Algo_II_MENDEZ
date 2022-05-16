@@ -135,6 +135,9 @@ void *_buscar_elemento_en_nodo(nodo_abb_t *actual, void *elemento, abb_comparado
 
 void *abb_buscar(abb_t *arbol, void *elemento)
 {
+	if(!arbol)
+		return NULL;
+
 	return _buscar_elemento_en_nodo(arbol->nodo_raiz, elemento, arbol->comparador);
 }
 
@@ -225,6 +228,9 @@ size_t abb_con_cada_elemento(abb_t *arbol, abb_recorrido recorrido,
 			     bool (*funcion)(void *, void *), void *aux)
 {
 	size_t veces_invocada = 0;
+	if(!arbol || !funcion)
+		return veces_invocada;
+
 	bool cortar_ejecucion = true;
 
 	switch(recorrido)
@@ -289,6 +295,8 @@ size_t abb_recorrer(abb_t *arbol, abb_recorrido recorrido, void **array,
 		    size_t tamanio_array)
 {
 	size_t elementos_guardados = 0;
+	if(!arbol || !array || tamanio_array == 0)
+		return elementos_guardados;
 
 	switch(recorrido)
 	{
