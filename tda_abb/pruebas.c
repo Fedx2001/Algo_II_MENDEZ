@@ -832,6 +832,16 @@ void los_recorridos_de_un_abb_con_un_array_de_mayor_tamanio_que_el_abb_solo_guar
 	abb_destruir(abb);
 }
 
+void abb_null_tiene_tamanio_0()
+{
+	pa2m_afirmar(abb_tamanio(NULL) == 0, "Un abb NULL tiene tamaño 0");
+}
+
+void abb_null_esta_vacio()
+{
+	pa2m_afirmar(abb_vacio(NULL) == true, "Un abb NULL esta vacio");
+}
+
 void destruir_un_arbol_con_elementos_no_pierde_memoria()
 {
 	abb_t *abb = abb_crear(comparar_enteros);
@@ -944,6 +954,10 @@ int main()
 	recorrer_un_abb_con_preorden_guarda_la_cantidad_de_elementos_indicada_en_el_orden_correcto();
 	recorrer_un_abb_con_inorden_guarda_la_cantidad_de_elementos_indicada_en_el_orden_correcto();
 	los_recorridos_de_un_abb_con_un_array_de_mayor_tamanio_que_el_abb_solo_guardan_los_elementos_del_abb();
+
+	pa2m_nuevo_grupo("Pruebas de tamaño y vacio con abb NULL");
+	abb_null_tiene_tamanio_0();
+	abb_null_esta_vacio();
 
 	pa2m_nuevo_grupo("Pruebas de destructores (no deberían perder memoria)");
 	destruir_un_arbol_con_elementos_no_pierde_memoria();
