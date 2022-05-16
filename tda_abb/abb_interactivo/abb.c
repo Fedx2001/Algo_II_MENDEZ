@@ -135,12 +135,15 @@ void *_buscar_elemento_en_nodo(nodo_abb_t *actual, void *elemento, abb_comparado
 
 void *abb_buscar(abb_t *arbol, void *elemento)
 {
+	if(!arbol)
+		return NULL;
+
 	return _buscar_elemento_en_nodo(arbol->nodo_raiz, elemento, arbol->comparador);
 }
 
 bool abb_vacio(abb_t *arbol)
 {
-	if(arbol && arbol->nodo_raiz)
+	if(arbol && !arbol->nodo_raiz)
 		return true;
 
 	return false;
@@ -225,18 +228,21 @@ size_t abb_con_cada_elemento(abb_t *arbol, abb_recorrido recorrido,
 			     bool (*funcion)(void *, void *), void *aux)
 {
 	size_t veces_invocada = 0;
-	bool resultado = true;
+	if(!arbol || !funcion)
+		return veces_invocada;
+
+	bool cortar_ejecucion = true;
 
 	switch(recorrido)
 	{
 	case INORDEN:
-		_con_cada_elemento_inorden(arbol->nodo_raiz, funcion, aux, &veces_invocada, &resultado);
+		_con_cada_elemento_inorden(arbol->nodo_raiz, funcion, aux, &veces_invocada, &cortar_ejecucion);
 		break;
 	case POSTORDEN:
-		_con_cada_elemento_postorden(arbol->nodo_raiz, funcion, aux, &veces_invocada, &resultado);
+		_con_cada_elemento_postorden(arbol->nodo_raiz, funcion, aux, &veces_invocada, &cortar_ejecucion);
 		break;
 	case PREORDEN:
-		_con_cada_elemento_preorden(arbol->nodo_raiz, funcion, aux, &veces_invocada, &resultado);
+		_con_cada_elemento_preorden(arbol->nodo_raiz, funcion, aux, &veces_invocada, &cortar_ejecucion);
 		break;
 	}
 
@@ -245,11 +251,13 @@ size_t abb_con_cada_elemento(abb_t *arbol, abb_recorrido recorrido,
 
 void _recorrido_inorden(nodo_abb_t *actual, void **array, size_t tamanio_array, size_t *elementos_guardados)
 {
-	if(!actual || *elementos_guardados >= tamanio_array)
+	if(!actual)
 		return;
 
 	_recorrido_inorden(actual->izquierda, array, tamanio_array, elementos_guardados);
 	
+	if(*elementos_guardados >= tamanio_array)
+		return;
 	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
@@ -259,12 +267,14 @@ void _recorrido_inorden(nodo_abb_t *actual, void **array, size_t tamanio_array, 
 
 void _recorrido_postorden(nodo_abb_t *actual, void **array, size_t tamanio_array, size_t *elementos_guardados)
 {
-	if(!actual || *elementos_guardados >= tamanio_array)
+	if(!actual)
 		return;
 
-	_recorrido_inorden(actual->izquierda, array, tamanio_array, elementos_guardados);
-	_recorrido_inorden(actual->derecha, array, tamanio_array, elementos_guardados);
+	_recorrido_postorden(actual->izquierda, array, tamanio_array, elementos_guardados);
+	_recorrido_postorden(actual->derecha, array, tamanio_array, elementos_guardados);
 	
+	if(*elementos_guardados == tamanio_array)
+		return;
 	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
@@ -272,21 +282,26 @@ void _recorrido_postorden(nodo_abb_t *actual, void **array, size_t tamanio_array
 
 void _recorrido_preorden(nodo_abb_t *actual, void **array, size_t tamanio_array, size_t *elementos_guardados)
 {
-	if(!actual || *elementos_guardados >= tamanio_array)
+	if(!actual)
 		return;
 
 	void *elemento = actual->elemento;
+	
+	if(*elementos_guardados >= tamanio_array)
+		return;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
 	
-	_recorrido_inorden(actual->izquierda, array, tamanio_array, elementos_guardados);
-	_recorrido_inorden(actual->derecha, array, tamanio_array, elementos_guardados);
+	_recorrido_preorden(actual->izquierda, array, tamanio_array, elementos_guardados);
+	_recorrido_preorden(actual->derecha, array, tamanio_array, elementos_guardados);
 }
 
 size_t abb_recorrer(abb_t *arbol, abb_recorrido recorrido, void **array,
 		    size_t tamanio_array)
 {
 	size_t elementos_guardados = 0;
+	if(!arbol || !array || tamanio_array == 0)
+		return elementos_guardados;
 
 	switch(recorrido)
 	{

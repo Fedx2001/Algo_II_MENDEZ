@@ -251,11 +251,13 @@ size_t abb_con_cada_elemento(abb_t *arbol, abb_recorrido recorrido,
 
 void _recorrido_inorden(nodo_abb_t *actual, void **array, size_t tamanio_array, size_t *elementos_guardados)
 {
-	if(!actual || *elementos_guardados >= tamanio_array)
+	if(!actual)
 		return;
 
 	_recorrido_inorden(actual->izquierda, array, tamanio_array, elementos_guardados);
 	
+	if(*elementos_guardados >= tamanio_array)
+		return;
 	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
@@ -268,10 +270,10 @@ void _recorrido_postorden(nodo_abb_t *actual, void **array, size_t tamanio_array
 	if(!actual)
 		return;
 
-	_recorrido_inorden(actual->izquierda, array, tamanio_array, elementos_guardados);
-	_recorrido_inorden(actual->derecha, array, tamanio_array, elementos_guardados);
+	_recorrido_postorden(actual->izquierda, array, tamanio_array, elementos_guardados);
+	_recorrido_postorden(actual->derecha, array, tamanio_array, elementos_guardados);
 	
-	if(*elementos_guardados >= tamanio_array)
+	if(*elementos_guardados == tamanio_array)
 		return;
 	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
@@ -280,15 +282,18 @@ void _recorrido_postorden(nodo_abb_t *actual, void **array, size_t tamanio_array
 
 void _recorrido_preorden(nodo_abb_t *actual, void **array, size_t tamanio_array, size_t *elementos_guardados)
 {
-	if(!actual || *elementos_guardados >= tamanio_array)
+	if(!actual)
 		return;
 
 	void *elemento = actual->elemento;
+	
+	if(*elementos_guardados >= tamanio_array)
+		return;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
 	
-	_recorrido_inorden(actual->izquierda, array, tamanio_array, elementos_guardados);
-	_recorrido_inorden(actual->derecha, array, tamanio_array, elementos_guardados);
+	_recorrido_preorden(actual->izquierda, array, tamanio_array, elementos_guardados);
+	_recorrido_preorden(actual->derecha, array, tamanio_array, elementos_guardados);
 }
 
 size_t abb_recorrer(abb_t *arbol, abb_recorrido recorrido, void **array,

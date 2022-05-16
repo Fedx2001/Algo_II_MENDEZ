@@ -1,5 +1,5 @@
 #include "src/abb.h"
-#include "src/lista.h"
+#include "src/cola.h"
 #include <stdio.h>
 #include "pa2mm.h"
 #include "string.h"
@@ -131,9 +131,25 @@ void no_puedo_quitar_de_un_abb_vacio()
 {
 	abb_t *arbol = abb_crear(comparar_enteros);
 
+	int elementos[6] = {24,345,12,99,1,15};
+
+	for(int i=0; i<6; i++)
+		abb_insertar(arbol, elementos+i);
+
+	int a_borrar = 25;
+
+	pa2m_afirmar(abb_quitar(arbol, &a_borrar) == NULL, "No puedo quitar un elemento de un abb vacio");
+
+	abb_destruir(arbol);
+}
+
+void no_puedo_quitar_un_elemento_que_no_existe_en_un_abb()
+{
+	abb_t *arbol = abb_crear(comparar_enteros);
+
 	char elemento = 123;
 
-	pa2m_afirmar(abb_quitar(arbol, &elemento) == NULL, "No puedo quitar un elemento de un abb vacio");
+	pa2m_afirmar(abb_quitar(arbol, &elemento) == NULL, "No puedo quitar un elemento que no existe del abb");
 
 	abb_destruir(arbol);
 }
@@ -542,39 +558,333 @@ void con_cada_elemento_con_recorrido_inorden_hasta_encontrar_el_10_invoca_a_la_f
 	abb_destruir(arbol);
 }
 
+bool seguir_recorriendo_con_cola(void *elemento, void *aux)
+{
+	cola_t *cola = aux;
+	cola_encolar(cola, elemento);
+	if(elemento != cola_frente(cola))
+		return true;
+	return false;
+}
+
 void con_cada_elemento_con_recorrido_postorden_recorre_los_elementos_correctos_hasta_encontrar_el_10()
 {
+	abb_t *arbol = abb_crear(comparar_enteros);
 
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(arbol, elementos+i);
+
+	cola_t *elementos_recorridos = cola_crear();
+	cola_encolar(elementos_recorridos, elementos+6);
+
+	abb_con_cada_elemento(arbol, POSTORDEN, seguir_recorriendo_con_cola, elementos_recorridos);
+
+	cola_desencolar(elementos_recorridos);
+
+	bool recorrido_correcto = true;
+	if(cola_frente(elementos_recorridos) != elementos+6)
+		recorrido_correcto = false;
+	
+	cola_desencolar(elementos_recorridos);
+
+	if(cola_vacia(elementos_recorridos) != true)
+		recorrido_correcto = false;
+
+	pa2m_afirmar(recorrido_correcto == true, "El elemento recorrido en POSTORDEN fue el correcto");
+
+	cola_destruir(elementos_recorridos);
+
+	abb_destruir(arbol);
 }
 
 void con_cada_elemento_con_recorrido_preorden_recorre_los_elementos_correctos_hasta_encontrar_el_10()
 {
+	abb_t *arbol = abb_crear(comparar_enteros);
 
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(arbol, elementos+i);
+
+	cola_t *elementos_recorridos = cola_crear();
+	cola_encolar(elementos_recorridos, elementos+6);
+
+	abb_con_cada_elemento(arbol, PREORDEN, seguir_recorriendo_con_cola, elementos_recorridos);
+
+	cola_desencolar(elementos_recorridos);
+
+	bool recorrido_correcto = true;
+	if(cola_frente(elementos_recorridos) != elementos)
+		recorrido_correcto = false;
+
+	cola_desencolar(elementos_recorridos);
+	if(cola_frente(elementos_recorridos) != elementos+2)
+		recorrido_correcto = false;
+
+	cola_desencolar(elementos_recorridos);
+	if(cola_frente(elementos_recorridos) != elementos+4)
+		recorrido_correcto = false;
+
+	cola_desencolar(elementos_recorridos);
+	if(cola_frente(elementos_recorridos) != elementos+6)
+		recorrido_correcto = false;
+
+	cola_desencolar(elementos_recorridos);
+	if(cola_vacia(elementos_recorridos) != true)
+		recorrido_correcto = false;
+
+	pa2m_afirmar(recorrido_correcto == true, "Los elementos recorridos en PREORDEN fueron los correctos");
+
+	cola_destruir(elementos_recorridos);
+
+	abb_destruir(arbol);
 }
 
 void con_cada_elemento_con_recorrido_inorden_recorre_los_elementos_correctos_hasta_encontrar_el_10()
 {
+	abb_t *arbol = abb_crear(comparar_enteros);
 
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(arbol, elementos+i);
+
+	cola_t *elementos_recorridos = cola_crear();
+	cola_encolar(elementos_recorridos, elementos+6);
+
+	abb_con_cada_elemento(arbol, INORDEN, seguir_recorriendo_con_cola, elementos_recorridos);
+
+	cola_desencolar(elementos_recorridos);
+
+	bool recorrido_correcto = true;
+	if(cola_frente(elementos_recorridos) != elementos+4)
+		recorrido_correcto = false;
+
+	cola_desencolar(elementos_recorridos);
+	if(cola_frente(elementos_recorridos) != elementos+6)
+		recorrido_correcto = false;
+
+	cola_desencolar(elementos_recorridos);
+	if(cola_vacia(elementos_recorridos) != true)
+		recorrido_correcto = false;
+
+	pa2m_afirmar(recorrido_correcto == true, "Los elementos recorridos en INORDEN fueron los correctos");
+
+	cola_destruir(elementos_recorridos);
+
+	abb_destruir(arbol);
+}
+
+void recorrer_con_abb_nulo_no_hace_nada()
+{
+	void *array[3] = {NULL, NULL, NULL};
+	pa2m_afirmar(abb_recorrer(NULL, INORDEN, array, 3) == 0, "Recorrer un abb NULL no hace nada");
+}
+
+void recorrer_con_array_nulo_no_hace_nada()
+{
+	abb_t *abb = abb_crear(comparar_enteros);
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(abb, elementos+i);
+
+	pa2m_afirmar(abb_recorrer(abb, INORDEN, NULL, 8) == 0, "Recorrer un abb con array NULL no hace nada");
+
+	abb_destruir(abb);
+}
+
+void recorrer_con_tamanio_array_0_no_hace_nada()
+{
+	abb_t *abb = abb_crear(comparar_enteros);
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(abb, elementos+i);
+
+	void *array[5];
+
+	pa2m_afirmar(abb_recorrer(abb, INORDEN, array, 0) == 0, "Recorrer un abb con un array de tamaño 0 no hace nada");
+
+	abb_destruir(abb);
+}
+
+void recorrer_un_abb_con_postorden_guarda_la_cantidad_de_elementos_indicada_en_el_orden_correcto()
+{
+	abb_t *abb = abb_crear(comparar_enteros);
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(abb, elementos+i);
+
+	void *array[5] = {NULL, NULL, NULL, NULL, NULL};
+
+	pa2m_afirmar(abb_recorrer(abb, POSTORDEN, array, 5) == 5, "Recorrer un abb POSTORDEN con un array de tamaño 5 guarda 5 elementos");
+
+	bool recorrido_correcto = true;
+	if(array[0] != elementos+6)
+		recorrido_correcto = false;
+
+	if(array[1] != elementos+4)
+		recorrido_correcto = false;
+
+	if(array[2] != elementos+5)
+		recorrido_correcto = false;
+
+	if(array[3] != elementos+2)
+		recorrido_correcto = false;
+
+	if(array[4] != elementos+3)
+		recorrido_correcto = false;
+
+	pa2m_afirmar(recorrido_correcto == true, "Los elementos guardados estan en POSTORDEN");
+
+	abb_destruir(abb);
+}
+
+void recorrer_un_abb_con_preorden_guarda_la_cantidad_de_elementos_indicada_en_el_orden_correcto()
+{
+	abb_t *abb = abb_crear(comparar_enteros);
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(abb, elementos+i);
+
+	void *array[5] = {NULL, NULL, NULL, NULL, NULL};
+
+	pa2m_afirmar(abb_recorrer(abb, PREORDEN, array, 5) == 5, "Recorrer un abb PREORDEN con un array de tamaño 5 guarda 5 elementos");
+
+	bool recorrido_correcto = true;
+	if(array[0] != elementos)
+		recorrido_correcto = false;
+
+	if(array[1] != elementos+2)
+		recorrido_correcto = false;
+
+	if(array[2] != elementos+4)
+		recorrido_correcto = false;
+
+	if(array[3] != elementos+6)
+		recorrido_correcto = false;
+
+	if(array[4] != elementos+5)
+		recorrido_correcto = false;
+
+	pa2m_afirmar(recorrido_correcto == true, "Los elementos guardados estan en PREORDEN");
+
+	abb_destruir(abb);
+}
+
+void recorrer_un_abb_con_inorden_guarda_la_cantidad_de_elementos_indicada_en_el_orden_correcto()
+{
+	abb_t *abb = abb_crear(comparar_enteros);
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(abb, elementos+i);
+
+	void *array[5] = {NULL, NULL, NULL, NULL, NULL};
+
+	pa2m_afirmar(abb_recorrer(abb, INORDEN, array, 5) == 5, "Recorrer un abb INORDEN con un array de tamaño 5 guarda 5 elementos");
+
+	bool recorrido_correcto = true;
+	if(array[0] != elementos+4)
+		recorrido_correcto = false;
+
+	if(array[1] != elementos+6)
+		recorrido_correcto = false;
+
+	if(array[2] != elementos+2)
+		recorrido_correcto = false;
+
+	if(array[3] != elementos+5)
+		recorrido_correcto = false;
+
+	if(array[4] != elementos)
+		recorrido_correcto = false;
+
+	pa2m_afirmar(recorrido_correcto == true, "Los elementos guardados estan INORDEN");
+
+	abb_destruir(abb);
+}
+
+void los_recorridos_de_un_abb_con_un_array_de_mayor_tamanio_que_el_abb_solo_guardan_los_elementos_del_abb()
+{
+	abb_t *abb = abb_crear(comparar_enteros);
+	int elementos[7] = {24,345,12,99,1,15,10};
+
+	for(int i=0; i<7; i++)
+		abb_insertar(abb, elementos+i);
+
+	void *array[10] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+
+	pa2m_afirmar(abb_recorrer(abb, POSTORDEN, array, 10) == 7, "Recorrer en POSTORDEN con un array de mayor tamaño que el abb guarda solo los elementos del arbol");
+	pa2m_afirmar(array[7] == NULL && array[8] == NULL && array[9] == NULL, "No se guardan elementos extra");
+	
+	pa2m_afirmar(abb_recorrer(abb, INORDEN, array, 10) == 7, "Recorrer en INORDEN con un array de mayor tamaño que el abb guarda solo los elementos del arbol");
+	pa2m_afirmar(array[7] == NULL && array[8] == NULL && array[9] == NULL, "No se guardan elementos extra");
+	
+	pa2m_afirmar(abb_recorrer(abb, PREORDEN, array, 10) == 7, "Recorrer en PREORDEN con un array de mayor tamaño que el abb guarda solo los elementos del arbol");
+	pa2m_afirmar(array[7] == NULL && array[8] == NULL && array[9] == NULL, "No se guardan elementos extra");
+
+	abb_destruir(abb);
 }
 
 void destruir_un_arbol_con_elementos_no_pierde_memoria()
 {
+	abb_t *abb = abb_crear(comparar_enteros);
+	int elementos[7] = {24,345,12,99,1,15,10};
 
+	for(int i=0; i<7; i++)
+		abb_insertar(abb, elementos+i);
+
+	pa2m_afirmar(true, "Prueba del destructor normal (no debería perder memoria)");
+
+	abb_destruir(abb);
 }
 
 void destruir_todos_con_destructor_null_no_destruye_elementos()
 {
+	abb_t *abb = abb_crear(comparar_enteros);
+	int *elementos = malloc(7 * sizeof(int));
 
+	for(int i=0; i<7; i++){
+		elementos[i] = i%2 == 0 ? (-i-1) * 2 : (i+1)*2;
+		abb_insertar(abb, elementos+i);
+	}
+
+	pa2m_afirmar(true, "Prueba de destruir todo con destructor NULL (no debería perder memoria ni destruir elementos)");
+
+	abb_destruir_todo(abb, NULL);
+
+	elementos[0] = 321;
+
+	free(elementos);
 }
 
-void destruir_todos_con_destructor_no_null_no_pierde_memoria();
+void destruir_todos_con_destructor_no_null_no_pierde_memoria()
 {
+	abb_t *abb = abb_crear(comparar_enteros);
+	int **elementos = malloc(4 * sizeof(int *));
 
+	for(int i=0; i<4; i++){
+		elementos[i] = malloc(sizeof(int));
+		*elementos[i] = (i%2 == 0 ? (-i-1) * 2 : (i+1)*2);
+		abb_insertar(abb, elementos[i]);
+	}
+
+	pa2m_afirmar(true, "Prueba de destruir todo con destructor no NULL (no debería perder memoria)");
+
+	abb_destruir_todo(abb, free);
+
+	free(elementos);
 }
 
 int main()
 {
-	pa2m_nuevo_grupo("Pruebas de ABB");
+	pa2m_nuevo_grupo("<- (: Pruebas de ABB :) ->");
 	pa2m_nuevo_grupo("Prueba de creación");
 	crear_un_abb_crea_un_abb_con_tamanio_0_y_raiz_nula();
 	no_puedo_crear_un_abb_con_funcion_comparadora_nula();
@@ -590,6 +900,7 @@ int main()
 	pa2m_nuevo_grupo("Pruebas de Eliminación");
 	no_puedo_quitar_de_un_abb_null();
 	no_puedo_quitar_de_un_abb_vacio();
+	no_puedo_quitar_un_elemento_que_no_existe_en_un_abb();
 	quitar_la_raiz_en_un_abb_con_un_solo_elemento_deja_al_abb_vacio_y_con_tamanio_0();
 	quitar_un_nodo_con_hijo_derecho_actualiza_correctamente_los_nodos_y_el_tamanio();
 	quitar_un_nodo_con_hijo_izquierdo_actualiza_correctamente_los_nodos_y_el_tamanio();
@@ -613,14 +924,20 @@ int main()
 	no_puedo_usar_el_iterador_interno_con_funcion_null();
 	iterador_interno_de_un_arbol_vacio_invoca_a_la_funcion_0_veces();
 	con_cada_elemento_con_recorrido_postorden_hasta_encontrar_el_10_invoca_a_la_funcion_una_sola_vez();
-	con_cada_elemento_con_recorrido_preorden_hasta_encontrar_el_10_invoca_a_la_funcion_cuatro_veces();
-	con_cada_elemento_con_recorrido_inorden_hasta_encontrar_el_10_invoca_a_la_funcion_dos_veces();
 	con_cada_elemento_con_recorrido_postorden_recorre_los_elementos_correctos_hasta_encontrar_el_10();
+	con_cada_elemento_con_recorrido_preorden_hasta_encontrar_el_10_invoca_a_la_funcion_cuatro_veces();
 	con_cada_elemento_con_recorrido_preorden_recorre_los_elementos_correctos_hasta_encontrar_el_10();
+	con_cada_elemento_con_recorrido_inorden_hasta_encontrar_el_10_invoca_a_la_funcion_dos_veces();
 	con_cada_elemento_con_recorrido_inorden_recorre_los_elementos_correctos_hasta_encontrar_el_10();
 	
 	pa2m_nuevo_grupo("Pruebas de recorrer");
-	
+	recorrer_con_abb_nulo_no_hace_nada();
+	recorrer_con_array_nulo_no_hace_nada();
+	recorrer_con_tamanio_array_0_no_hace_nada();
+	recorrer_un_abb_con_postorden_guarda_la_cantidad_de_elementos_indicada_en_el_orden_correcto();
+	recorrer_un_abb_con_preorden_guarda_la_cantidad_de_elementos_indicada_en_el_orden_correcto();
+	recorrer_un_abb_con_inorden_guarda_la_cantidad_de_elementos_indicada_en_el_orden_correcto();
+	los_recorridos_de_un_abb_con_un_array_de_mayor_tamanio_que_el_abb_solo_guardan_los_elementos_del_abb();
 
 	pa2m_nuevo_grupo("Pruebas de destructores (no deberían perder memoria)");
 	destruir_un_arbol_con_elementos_no_pierde_memoria();
