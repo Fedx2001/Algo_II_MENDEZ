@@ -882,6 +882,12 @@ void destruir_todos_con_destructor_no_null_no_pierde_memoria()
 	free(elementos);
 }
 
+void destruir_con_abb_null_no_causa_errores()
+{
+	pa2m_afirmar(true, "Prueba de destruir un abb NULL (no debería causar errores)");
+	abb_destruir(NULL);
+}
+
 int main()
 {
 	pa2m_nuevo_grupo("<- (: Pruebas de ABB :) ->");
@@ -943,6 +949,7 @@ int main()
 	destruir_un_arbol_con_elementos_no_pierde_memoria();
 	destruir_todos_con_destructor_null_no_destruye_elementos();
 	destruir_todos_con_destructor_no_null_no_pierde_memoria();
+	destruir_con_abb_null_no_causa_errores();
 
 	return pa2m_mostrar_reporte();
 }

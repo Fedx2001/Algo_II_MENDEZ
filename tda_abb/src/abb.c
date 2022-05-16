@@ -143,7 +143,7 @@ void *abb_buscar(abb_t *arbol, void *elemento)
 
 bool abb_vacio(abb_t *arbol)
 {
-	if(arbol && !arbol->nodo_raiz)
+	if((arbol && !arbol->nodo_raiz) || !arbol)
 		return true;
 
 	return false;
@@ -171,12 +171,16 @@ void _abb_destruir_nodos(nodo_abb_t *actual, void (*destructor)(void *))
 
 void abb_destruir(abb_t *arbol)
 {
+	if(!arbol)
+		return;
 	_abb_destruir_nodos(arbol->nodo_raiz, NULL);
 	free(arbol);
 }
 
 void abb_destruir_todo(abb_t *arbol, void (*destructor)(void *))
 {
+	if(!arbol)
+		return;
 	_abb_destruir_nodos(arbol->nodo_raiz, destructor);
 	free(arbol);
 }
