@@ -196,7 +196,7 @@ void _con_cada_elemento_inorden(nodo_abb_t *actual, bool (*funcion)(void *, void
 		return;
 	*cortar_ejecucion = funcion(actual->elemento, aux);
 	*veces_invocada = *veces_invocada + 1;
-	
+
 	_con_cada_elemento_inorden(actual->derecha, funcion, aux, veces_invocada, cortar_ejecucion);
 }
 
@@ -259,9 +259,10 @@ void _recorrido_inorden(nodo_abb_t *actual, void **array, size_t tamanio_array, 
 		return;
 
 	_recorrido_inorden(actual->izquierda, array, tamanio_array, elementos_guardados);
-	
+
 	if(*elementos_guardados >= tamanio_array)
 		return;
+
 	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
@@ -276,9 +277,10 @@ void _recorrido_postorden(nodo_abb_t *actual, void **array, size_t tamanio_array
 
 	_recorrido_postorden(actual->izquierda, array, tamanio_array, elementos_guardados);
 	_recorrido_postorden(actual->derecha, array, tamanio_array, elementos_guardados);
-	
+
 	if(*elementos_guardados == tamanio_array)
 		return;
+
 	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
@@ -289,13 +291,13 @@ void _recorrido_preorden(nodo_abb_t *actual, void **array, size_t tamanio_array,
 	if(!actual)
 		return;
 
-	void *elemento = actual->elemento;
-	
 	if(*elementos_guardados >= tamanio_array)
 		return;
+
+	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
-	
+
 	_recorrido_preorden(actual->izquierda, array, tamanio_array, elementos_guardados);
 	_recorrido_preorden(actual->derecha, array, tamanio_array, elementos_guardados);
 }
