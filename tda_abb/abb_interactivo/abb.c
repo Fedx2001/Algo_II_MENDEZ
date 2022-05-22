@@ -53,14 +53,14 @@ abb_t *abb_insertar(abb_t *arbol, void *elemento)
 	return arbol;
 }
 
-nodo_abb_t *_buscar_predecesor_inorden(nodo_abb_t *actual, nodo_abb_t ***quitado)
+nodo_abb_t *_buscar_predecesor_inorden(nodo_abb_t *actual, nodo_abb_t **extraido)
 {
 	if(!actual->derecha){
-		**quitado = actual;
+		*extraido = actual;
 		return actual->izquierda;
 	}
 
-	actual->derecha = _buscar_predecesor_inorden(actual->derecha, quitado);
+	actual->derecha = _buscar_predecesor_inorden(actual->derecha, extraido);
 	return actual;
 }
 
@@ -74,13 +74,10 @@ nodo_abb_t *_abb_eliminar_nodo(abb_comparador comparador, nodo_abb_t *actual, no
 		*quitado = actual;
 
 		if(actual->derecha && actual->izquierda){
-			actual->izquierda = _buscar_predecesor_inorden(actual->izquierda, &quitado);
-
-			void *aux = actual->elemento;
-
-			actual->elemento = (*quitado)->elemento;
-
-			(*quitado)->elemento = aux;
+			nodo_abb_t *derecha = actual->derecha;
+			nodo_abb_t *nueva_izquierda = _buscar_predecesor_inorden(actual->izquierda, &actual);
+			actual->izquierda = nueva_izquierda;
+			actual->derecha = derecha;
 
 			return actual;
 		}
@@ -143,7 +140,7 @@ void *abb_buscar(abb_t *arbol, void *elemento)
 
 bool abb_vacio(abb_t *arbol)
 {
-	if(arbol && !arbol->nodo_raiz)
+	if((arbol && !arbol->nodo_raiz) || !arbol)
 		return true;
 
 	return false;
@@ -171,12 +168,16 @@ void _abb_destruir_nodos(nodo_abb_t *actual, void (*destructor)(void *))
 
 void abb_destruir(abb_t *arbol)
 {
+	if(!arbol)
+		return;
 	_abb_destruir_nodos(arbol->nodo_raiz, NULL);
 	free(arbol);
 }
 
 void abb_destruir_todo(abb_t *arbol, void (*destructor)(void *))
 {
+	if(!arbol)
+		return;
 	_abb_destruir_nodos(arbol->nodo_raiz, destructor);
 	free(arbol);
 }
@@ -192,7 +193,7 @@ void _con_cada_elemento_inorden(nodo_abb_t *actual, bool (*funcion)(void *, void
 		return;
 	*cortar_ejecucion = funcion(actual->elemento, aux);
 	*veces_invocada = *veces_invocada + 1;
-	
+
 	_con_cada_elemento_inorden(actual->derecha, funcion, aux, veces_invocada, cortar_ejecucion);
 }
 
@@ -255,9 +256,10 @@ void _recorrido_inorden(nodo_abb_t *actual, void **array, size_t tamanio_array, 
 		return;
 
 	_recorrido_inorden(actual->izquierda, array, tamanio_array, elementos_guardados);
-	
+
 	if(*elementos_guardados >= tamanio_array)
 		return;
+
 	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
@@ -272,9 +274,10 @@ void _recorrido_postorden(nodo_abb_t *actual, void **array, size_t tamanio_array
 
 	_recorrido_postorden(actual->izquierda, array, tamanio_array, elementos_guardados);
 	_recorrido_postorden(actual->derecha, array, tamanio_array, elementos_guardados);
-	
+
 	if(*elementos_guardados == tamanio_array)
 		return;
+
 	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
@@ -285,13 +288,13 @@ void _recorrido_preorden(nodo_abb_t *actual, void **array, size_t tamanio_array,
 	if(!actual)
 		return;
 
-	void *elemento = actual->elemento;
-	
 	if(*elementos_guardados >= tamanio_array)
 		return;
+
+	void *elemento = actual->elemento;
 	array[*elementos_guardados] = elemento;
 	*elementos_guardados = *elementos_guardados + 1;
-	
+
 	_recorrido_preorden(actual->izquierda, array, tamanio_array, elementos_guardados);
 	_recorrido_preorden(actual->derecha, array, tamanio_array, elementos_guardados);
 }

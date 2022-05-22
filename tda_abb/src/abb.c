@@ -53,14 +53,14 @@ abb_t *abb_insertar(abb_t *arbol, void *elemento)
 	return arbol;
 }
 
-nodo_abb_t *_buscar_predecesor_inorden(nodo_abb_t *actual, nodo_abb_t ***quitado)
+nodo_abb_t *_buscar_predecesor_inorden(nodo_abb_t *actual, nodo_abb_t **extraido)
 {
 	if(!actual->derecha){
-		**quitado = actual;
+		*extraido = actual;
 		return actual->izquierda;
 	}
 
-	actual->derecha = _buscar_predecesor_inorden(actual->derecha, quitado);
+	actual->derecha = _buscar_predecesor_inorden(actual->derecha, extraido);
 	return actual;
 }
 
@@ -74,13 +74,11 @@ nodo_abb_t *_abb_eliminar_nodo(abb_comparador comparador, nodo_abb_t *actual, no
 		*quitado = actual;
 
 		if(actual->derecha && actual->izquierda){
-			actual->izquierda = _buscar_predecesor_inorden(actual->izquierda, &quitado);
-
-			void *aux = actual->elemento;
-
-			actual->elemento = (*quitado)->elemento;
-
-			(*quitado)->elemento = aux;
+			nodo_abb_t *vieja_derecha = actual->derecha;
+			nodo_abb_t *nueva_izquierda = _buscar_predecesor_inorden(actual->izquierda, &actual);
+			
+			actual->izquierda = nueva_izquierda;
+			actual->derecha = vieja_derecha;
 
 			return actual;
 		}
