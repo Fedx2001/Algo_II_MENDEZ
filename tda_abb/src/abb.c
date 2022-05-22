@@ -22,7 +22,7 @@ abb_t *abb_crear(abb_comparador comparador)
 	return arbol;
 }
 
-nodo_abb_t *_abb_insertar(abb_t *arbol, nodo_abb_t *actual, void *elemento)
+nodo_abb_t *_abb_insertar_nuevo_nodo(abb_t *arbol, nodo_abb_t *actual, void *elemento)
 {
 	if(!actual){
 		nodo_abb_t *nodo = calloc(1, sizeof(nodo_abb_t));
@@ -35,9 +35,9 @@ nodo_abb_t *_abb_insertar(abb_t *arbol, nodo_abb_t *actual, void *elemento)
 	}
 
 	if(arbol->comparador(actual->elemento, elemento) < COMPARACION_EXITOSA)
-		actual->derecha = _abb_insertar(arbol, actual->derecha, elemento);
+		actual->derecha = _abb_insertar_nuevo_nodo(arbol, actual->derecha, elemento);
 	else
-		actual->izquierda = _abb_insertar(arbol, actual->izquierda, elemento);
+		actual->izquierda = _abb_insertar_nuevo_nodo(arbol, actual->izquierda, elemento);
 
 	return actual;
 }
@@ -47,7 +47,7 @@ abb_t *abb_insertar(abb_t *arbol, void *elemento)
 	if(!arbol)
 		return NULL;
 
-	arbol->nodo_raiz = _abb_insertar(arbol, arbol->nodo_raiz, elemento);
+	arbol->nodo_raiz = _abb_insertar_nuevo_nodo(arbol, arbol->nodo_raiz, elemento);
 	arbol->tamanio++;
 
 	return arbol;
