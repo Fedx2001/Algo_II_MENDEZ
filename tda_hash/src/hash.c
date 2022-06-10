@@ -1,12 +1,9 @@
 #include "hash.h"
-
-struct par_hash{
-	char *clave;
-	void *valor;
-};
+#include <string.h>
 
 struct nodo_hash {
-	struct par_hash *par;
+	char *clave;
+	void *valor;
 	struct nodo_hash *siguiente;
 };
 
@@ -16,27 +13,16 @@ struct hash {
 	void **tabla;
 };
 
-/*
-* Possible hashing function
-*/
-static size_t getHash(const char* source)
-{    
-    if (source == NULL) {
-        return 0;
-    }
-
-    size_t hash = 0;
-    while (*source != '\0') {
-        char c = *source++;
-        int a = c - '0';
-        hash = (hash * 10) + a;     
-    } 
-    return hash;
-}
-
-size_t hashear_clave(char *clave, size_t capacidad)
+size_t hashear_clave(char *clave)
 {
-	return 0;
+	size_t hash = 0;
+
+	while(*clave != '\0'){
+		hash = *clave + 31*hash;
+		*clave++;
+	}
+
+	return hash;
 }
 
 hash_t *hash_crear(size_t capacidad)
@@ -59,9 +45,53 @@ hash_t *hash_crear(size_t capacidad)
 	return hash;
 }
 
+void rehash()
+{
+
+}
+
 hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 		      void **anterior)
 {
+	if(!clave) return NULL;
+
+	struct nodo_hash *nuevo = malloc(sizeof(struct nodo_hash));
+	if(!nuevo)
+		return NULL;
+
+	nuevo->siguiente = NULL;
+	nuevo->clave = clave;
+	nuevo->valor = elemento;
+
+	double factor_carga = hash->ocupados / hash->capacidad;
+	if(factor_carga <= 0.75){
+		hash->capacidad *= 2;
+		rehash(hash);
+	}
+
+	size_t clave_hasheada = hashear_clave(clave) % hash->capacidad;
+	
+	if(!hash->tabla[clave_hasheada]){
+		hash->tabla[clave_hasheada] = nuevo;
+	} else {
+		struct nodo_hash *actual = hash->tabla[clave_hasheada];
+
+		while(actual){
+			if(strcmp(actual->clave, clave) == 0){
+				*anterior = actual->valor;
+				actual->valor = elemento;
+				return hash;
+			}
+			actual = actual->siguiente;
+		}
+		
+		nuevo->siguiente = hash->tabla[clave_hasheada];
+		hash->tabla[clave_hasheada] = nuevo;
+	}
+	
+	hash->ocupados += 1;
+	*anterior = NULL;
+
 	return hash;
 }
 
@@ -82,7 +112,10 @@ bool hash_contiene(hash_t *hash, const char *clave)
 
 size_t hash_cantidad(hash_t *hash)
 {
-	return 0;
+	if(!hash)
+		return 0;
+
+	return hash->ocupados;
 }
 
 void hash_destruir(hash_t *hash)
