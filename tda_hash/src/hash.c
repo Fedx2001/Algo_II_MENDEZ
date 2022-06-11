@@ -1,6 +1,9 @@
 #include "hash.h"
 #include <string.h>
 
+#define FACTOR_CARGA_MAX 0.66
+#define INCREMENTO_CAPACIDAD 3
+
 struct nodo_hash {
 	char *clave;
 	void *valor;
@@ -18,7 +21,7 @@ size_t hashear_clave(char *clave)
 	size_t hash = 0;
 
 	while(*clave != '\0'){
-		hash = *clave + 31*hash;
+		hash += *clave;
 		*clave++;
 	}
 
@@ -45,7 +48,7 @@ hash_t *hash_crear(size_t capacidad)
 	return hash;
 }
 
-void rehash()
+void rehash(hash_t *hash)
 {
 
 }
@@ -63,9 +66,9 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 	nuevo->clave = clave;
 	nuevo->valor = elemento;
 
-	double factor_carga = hash->ocupados / hash->capacidad;
-	if(factor_carga <= 0.75){
-		hash->capacidad *= 2;
+	double factor_carga = (hash->ocupados+1) / hash->capacidad;
+	if(factor_carga >= FACTOR_CARGA_MAX){
+		hash->capacidad *= INCREMENTO_CAPACIDAD;
 		rehash(hash);
 	}
 
@@ -120,6 +123,20 @@ size_t hash_cantidad(hash_t *hash)
 
 void hash_destruir(hash_t *hash)
 {
+	if(!hash) return;
+	if(hash->tabla){
+		for(int i=0; i<hash->capacidad; i++){
+			struct nodo_hash *actual = hash->tabla[i];
+			while(actual){
+				struct nodo_hash *aux = actual->siguiente;
+				free(actual);
+				actual = aux;
+			}
+		}
+
+		free(hash->tabla);
+	}
+	free(hash);
 }
 
 void hash_destruir_todo(hash_t *hash, void (*destructor)(void *))
