@@ -8,7 +8,7 @@
 #define CONDICION_CORTE_IT_INTERNO false
 
 struct nodo_hash {
-	const char *clave;
+	char *clave;
 	void *elemento;
 	struct nodo_hash *siguiente;
 };
@@ -86,24 +86,29 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 
 	if(!hash) return NULL;
 
-	struct nodo_hash *nuevo_nodo = calloc(1, sizeof(struct nodo_hash));
-	if(!nuevo_nodo) return NULL;
-
-	nuevo_nodo->clave = clave;
-	
-	nuevo_nodo->elemento = elemento;
-
 	double factor_carga = (double)((hash->ocupados+1) / hash->capacidad);
 	if(factor_carga >= FACTOR_CARGA_MAX){
 		struct nodo_hash **nueva_tabla = rehash(hash->tabla, hash->capacidad);
 		if(!nueva_tabla) return NULL;
-		
+
 		hash->capacidad *= INCREMENTO_CAPACIDAD;
 
 		free(hash->tabla);
 		
 		hash->tabla = nueva_tabla;
 	}
+
+	struct nodo_hash *nuevo_nodo = calloc(1, sizeof(struct nodo_hash));
+	if(!nuevo_nodo) return NULL;
+
+	nuevo_nodo->clave = malloc(strlen(clave));
+	if(!nuevo_nodo->clave){
+		free(nuevo_nodo);
+		return NULL;
+	}
+	strcpy(nuevo_nodo->clave, clave);
+	
+	nuevo_nodo->elemento = elemento;
 
 	size_t clave_hasheada = hashear_clave(clave) % hash->capacidad;
 
@@ -117,6 +122,7 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 				*anterior = actual->elemento;
 				actual->elemento = elemento;
 
+				free(nuevo_nodo->clave);
 				free(nuevo_nodo);
 
 				return hash;
@@ -152,6 +158,7 @@ void *hash_quitar(hash_t *hash, const char *clave)
 		hash->tabla[clave_hasheada] = actual->siguiente;
 		elemento = actual->elemento;
 
+		free(actual->clave);
 		free(actual);
 	} else {
 		anterior = actual;
@@ -162,7 +169,8 @@ void *hash_quitar(hash_t *hash, const char *clave)
 				anterior->siguiente = actual->siguiente;
 
 				elemento = actual->elemento;
-
+				
+				free(actual->clave);
 				free(actual);
 
 				break;
@@ -235,6 +243,7 @@ void hash_destruir(hash_t *hash)
 			while(actual){
 				struct nodo_hash *siguiente = actual->siguiente;
 
+				free(actual->clave);
 				free(actual);
 
 				actual = siguiente;
@@ -259,6 +268,7 @@ void hash_destruir_todo(hash_t *hash, void (*destructor)(void *))
 
 				if(destructor) destructor(actual->elemento);
 
+				free(actual->clave);
 				free(actual);
 
 				actual = siguiente;
