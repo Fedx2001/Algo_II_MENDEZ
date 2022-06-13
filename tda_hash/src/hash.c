@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define FACTOR_CARGA_MAX 0.75
-#define INCREMENTO_CAPACIDAD 2
+#define FACTOR_CARGA_MAX 0.6
+#define INCREMENTO_CAPACIDAD 4
 #define ERROR 0
 #define CONDICION_CORTE_IT_INTERNO false
 
@@ -25,7 +25,7 @@ size_t hashear_clave(const char *clave)
 	
 	int i = 0;
 	while(clave[i] != '\0'){
-		hash += (size_t)(clave[i] * (i+1));
+		hash += (size_t)(clave[i]);
 		i++;
 	}
 
@@ -101,7 +101,7 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 	struct nodo_hash *nuevo_nodo = calloc(1, sizeof(struct nodo_hash));
 	if(!nuevo_nodo) return NULL;
 
-	nuevo_nodo->clave = malloc(strlen(clave));
+	nuevo_nodo->clave = malloc(strlen(clave)+1);
 	if(!nuevo_nodo->clave){
 		free(nuevo_nodo);
 		return NULL;
@@ -119,7 +119,7 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 
 		while(actual){
 			if(strcmp(actual->clave, clave) == 0){
-				*anterior = actual->elemento;
+				if(anterior) *anterior = actual->elemento;
 				actual->elemento = elemento;
 
 				free(nuevo_nodo->clave);
@@ -136,7 +136,7 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 	}
 	
 	hash->ocupados += 1;
-	*anterior = NULL;
+	if(anterior) *anterior = NULL;
 
 	return hash;
 }
@@ -152,16 +152,18 @@ void *hash_quitar(hash_t *hash, const char *clave)
 	void *elemento = NULL;
 
 	struct nodo_hash *actual = hash->tabla[clave_hasheada];
-	struct nodo_hash *anterior = NULL;
+	if(!actual) return NULL;
 
-	if(actual && strcmp(actual->clave, clave) == 0){
+	if(strcmp(actual->clave, clave) == 0){
 		hash->tabla[clave_hasheada] = actual->siguiente;
 		elemento = actual->elemento;
+
+		hash->ocupados--;
 
 		free(actual->clave);
 		free(actual);
 	} else {
-		anterior = actual;
+		struct nodo_hash *anterior = actual;
 		actual = actual->siguiente;
 
 		while(actual){
@@ -169,6 +171,7 @@ void *hash_quitar(hash_t *hash, const char *clave)
 				anterior->siguiente = actual->siguiente;
 
 				elemento = actual->elemento;
+				hash->ocupados--;
 				
 				free(actual->clave);
 				free(actual);
