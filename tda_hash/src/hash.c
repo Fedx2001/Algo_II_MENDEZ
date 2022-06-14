@@ -2,10 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define FACTOR_CARGA_MAX 0.6
-#define INCREMENTO_CAPACIDAD 4
+#define FACTOR_CARGA_MAX 0.75
+#define INCREMENTO_CAPACIDAD 3
 #define ERROR 0
-#define CONDICION_CORTE_IT_INTERNO false
+#define PARAR_ITERACION false
 
 struct nodo_hash {
 	char *clave;
@@ -25,7 +25,7 @@ size_t hashear_clave(const char *clave)
 	
 	int i = 0;
 	while(clave[i] != '\0'){
-		hash += (size_t)(clave[i]);
+		hash += (size_t)(clave[i]) + 31 * hash;
 		i++;
 	}
 
@@ -240,21 +240,19 @@ void hash_destruir(hash_t *hash)
 {
 	if(!hash) return;
 
-	if(hash->tabla){
-		for(int i = 0; i < hash->capacidad; i++){
-			struct nodo_hash *actual = hash->tabla[i];
-			while(actual){
-				struct nodo_hash *siguiente = actual->siguiente;
+	for(int i = 0; i < hash->capacidad; i++){
+		struct nodo_hash *actual = hash->tabla[i];
+		while(actual){
+			struct nodo_hash *siguiente = actual->siguiente;
 
-				free(actual->clave);
-				free(actual);
+			free(actual->clave);
+			free(actual);
 
-				actual = siguiente;
-			}
+			actual = siguiente;
 		}
-
-		free(hash->tabla);
 	}
+
+	free(hash->tabla);
 
 	free(hash);
 }
@@ -263,24 +261,24 @@ void hash_destruir_todo(hash_t *hash, void (*destructor)(void *))
 {
 	if(!hash) return;
 
-	if(hash->tabla){
-		for(int i = 0; i < hash->capacidad; i++){
-			struct nodo_hash *actual = hash->tabla[i];
-			while(actual){
-				struct nodo_hash *siguiente = actual->siguiente;
+	if(!destructor) return;
 
-				if(destructor) destructor(actual->elemento);
+	for(int i = 0; i < hash->capacidad; i++){
+		struct nodo_hash *actual = hash->tabla[i];
+		while(actual){
+			struct nodo_hash *siguiente = actual->siguiente;
 
-				free(actual->clave);
-				free(actual);
+			destructor(actual->elemento);
 
-				actual = siguiente;
-			}
+			free(actual->clave);
+			free(actual);
+
+			actual = siguiente;
 		}
-
-		free(hash->tabla);
 	}
 
+	free(hash->tabla);
+	
 	free(hash);
 }
 
@@ -292,22 +290,22 @@ size_t hash_con_cada_clave(hash_t *hash,
 
 	if(!hash) return ERROR;
 
-	size_t clave_iteradas = 0;
+	size_t claves_iteradas = 0;
 
 	for(int i = 0; i < hash->capacidad; i++){
 		struct nodo_hash *actual = hash->tabla[i];
 
 		while(actual){
-			clave_iteradas++;
+			claves_iteradas++;
 
-			if(f(actual->clave, actual->elemento, aux) == false){
-				return clave_iteradas;
+			if(f(actual->clave, actual->elemento, aux) == PARAR_ITERACION){
+				return claves_iteradas;
 			}
 
 			actual = actual->siguiente;
 		}
 	}
 
-	return clave_iteradas;
+	return claves_iteradas;
 }
 
