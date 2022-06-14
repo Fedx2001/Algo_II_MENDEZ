@@ -2,8 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define FACTOR_CARGA_MAX 0.75
-#define INCREMENTO_CAPACIDAD 3
+#define FACTOR_CARGA_LIMITE 0.75
+#define INCREMENTO_CAPACIDAD 2
 #define ERROR 0
 #define PARAR_ITERACION false
 
@@ -87,7 +87,7 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 	if(!hash) return NULL;
 
 	double factor_carga = (double)((hash->ocupados+1) / hash->capacidad);
-	if(factor_carga >= FACTOR_CARGA_MAX){
+	if(factor_carga >= FACTOR_CARGA_LIMITE){
 		struct nodo_hash **nueva_tabla = rehash(hash->tabla, hash->capacidad);
 		if(!nueva_tabla) return NULL;
 
