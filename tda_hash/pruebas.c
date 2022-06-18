@@ -97,10 +97,10 @@ void insertar_una_clave_con_mismo_hash_que_otra_no_reemplaza_la_clave_existente(
 	hash_t *hash = hash_crear(4);
 	int elementos[2] = {1, 10};
 
-	hash_insertar(hash, "A", elementos, NULL);
-	hash_insertar(hash, "B", elementos+1, NULL);
+	hash_insertar(hash, "BBBB", elementos, NULL);
+	hash_insertar(hash, "HHHH", elementos+1, NULL);
 
-	pa2m_afirmar(hash_obtener(hash, "A") == elementos && hash_obtener(hash, "B") == elementos+1,
+	pa2m_afirmar(hash_obtener(hash, "BBBB") == elementos && hash_obtener(hash, "HHHH") == elementos+1,
 				  "Insertar dos claves con el mismo valor de hash no reemplaza la clave ya existente");
 
 	hash_destruir(hash);
@@ -207,6 +207,24 @@ void no_puedo_obtener_un_elemento_con_clave_no_presente_en_hash()
 	hash_destruir(hash);
 }
 
+void puedo_obtener_el_elemento_asociado_a_una_clave_presente_en_el_hash()
+{
+	hash_t *hash = hash_crear(12);
+
+	int elementos[6] = {109999, 108888, 107777, 123788, 110321, 120393};
+	char clave[] = "AAAA";
+
+	for(int i = 0; i < 6; i++){
+		hash_insertar(hash, clave, elementos+i, NULL);
+		clave[0]++;
+	}
+
+	pa2m_afirmar(hash_obtener(hash, "CAAA") == elementos+2, 
+		     "Buscar una clave presente en la tabla devuelve el elemento");
+	
+	hash_destruir(hash);
+}
+
 void no_puedo_usar_hash_contiene_con_hash_NULL()
 {
 	pa2m_afirmar(hash_contiene(NULL, "AAAA") == false, "No puedo usar hash_contiene con hash NULL");
@@ -231,10 +249,48 @@ void un_hash_no_contiene_elemento_con_clave_no_presente_en_el_hash()
 	hash_destruir(hash);
 }
 
-
-bool comparador_enteros(const char *clave, void *valor, void *aux)
+void un_hash_contiene_un_elemento_asociado_a_una_clave_presente_en_la_tabla()
 {
-	return true;
+	hash_t *hash = hash_crear(12);
+
+	int elementos[6] = {109999, 108888, 107777, 123788, 110321, 120393};
+	char clave[] = "AAAA";
+
+	for(int i = 0; i < 6; i++){
+		hash_insertar(hash, clave, elementos+i, NULL);
+		clave[0]++;
+	}
+
+	pa2m_afirmar(hash_contiene(hash, "CAAA") == true, 
+		     "Hash contiene con clave presente en la tabla da true");
+	
+	hash_destruir(hash);
+}
+
+void buscar_una_clave_quitada_devuelve_false_y_no_encuentra_un_elemento()
+{
+	hash_t *hash = hash_crear(12);
+
+	int elementos[6] = {109999, 108888, 107777, 123788, 110321, 120393};
+	char clave[] = "AAAA";
+
+	for(int i = 0; i < 6; i++){
+		hash_insertar(hash, clave, elementos+i, NULL);
+		clave[0]++;
+	}
+	hash_quitar(hash, "AAAA");
+	pa2m_afirmar(hash_contiene(hash, "AAAA") == false, 
+		     "El hash no contiene una clave que fue eliminada");
+	pa2m_afirmar(hash_obtener(hash, "AAAA") == NULL, 
+		     "No encuentro un elemento con una clave que fue eliminada");
+	
+	hash_destruir(hash);
+}
+
+
+bool comparar_punteros_invertido(const char *clave, void *valor, void *elemento)
+{
+	return valor != elemento ?  true : false;
 }
 
 bool siempre_true(const char *clave, void *valor, void *aux)
@@ -244,7 +300,7 @@ bool siempre_true(const char *clave, void *valor, void *aux)
 
 void con_cada_clave_en_hash_NULL_devuelve_0_elementos_iterados()
 {
-	pa2m_afirmar(hash_con_cada_clave(NULL, comparador_enteros, NULL) == 0, 
+	pa2m_afirmar(hash_con_cada_clave(NULL, comparar_punteros_invertido, NULL) == 0, 
 		     "Iterador con hash NULL devuelve 0 claves iteradas");
 }
 
@@ -275,6 +331,25 @@ void iterar_con_funcion_siempre_true_itera_todas_las_claves()
 	
 	hash_destruir(hash);
 }
+
+void iterar_3_de_6_claves_devuelve_3_claves_iteradas()
+{
+	hash_t *hash = hash_crear(12);
+
+	int elementos[6] = {109999, 108888, 107777, 123788, 110321, 120393};
+	char clave[] = "AAAA0001";
+
+	for(int i = 0; i < 6; i++){
+		hash_insertar(hash, clave, elementos+i, NULL);
+		clave[i]++;
+	}
+
+	pa2m_afirmar(hash_con_cada_clave(hash, comparar_punteros_invertido, elementos+3) == 3, 
+		     "Itero 3 de 6 claves y el iterador me devuelve 3 claves iteradas");
+	
+	hash_destruir(hash);
+}
+
 
 int main()
 {
@@ -308,15 +383,19 @@ int main()
 	no_puedo_obtener_un_elemento_en_hash_NULL();
 	no_puedo_obtener_un_elemento_con_clave_NULL();
 	no_puedo_obtener_un_elemento_con_clave_no_presente_en_hash();
+	puedo_obtener_el_elemento_asociado_a_una_clave_presente_en_el_hash();
 	no_puedo_usar_hash_contiene_con_hash_NULL();
 	no_puedo_usar_hash_contiene_con_clave_NULL();
 	un_hash_no_contiene_elemento_con_clave_no_presente_en_el_hash();
+	un_hash_contiene_un_elemento_asociado_a_una_clave_presente_en_la_tabla();
+	buscar_una_clave_quitada_devuelve_false_y_no_encuentra_un_elemento();
 
 
 	pa2m_nuevo_grupo("Pruebas con cada clave");
 	con_cada_clave_en_hash_NULL_devuelve_0_elementos_iterados();
 	con_cada_clave_con_funcion_NULL_devuelve_0_elementos_iterados();
 	iterar_con_funcion_siempre_true_itera_todas_las_claves();
+	iterar_3_de_6_claves_devuelve_3_claves_iteradas();
 
 
 	return pa2m_mostrar_reporte();
