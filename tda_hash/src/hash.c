@@ -1,6 +1,7 @@
 #include "hash.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define FACTOR_CARGA_LIMITE 0.75
 #define INCREMENTO_CAPACIDAD 2
@@ -22,10 +23,10 @@ struct hash {
 size_t hashear_clave(const char *clave)
 {
 	size_t hash = 0;
-	
 	int i = 0;
+
 	while(clave[i] != '\0'){
-		hash += (size_t)(clave[i]) + 31 * hash;
+		hash += (size_t)(clave[i] * (i+1));
 		i++;
 	}
 
@@ -37,7 +38,7 @@ hash_t *hash_crear(size_t capacidad)
 	hash_t *hash = calloc(1, sizeof(hash_t));
 	if(!hash)
 		return NULL;
-	
+
 	if(capacidad <= 3) hash->capacidad = 3;
 	else hash->capacidad = capacidad;
 
@@ -63,7 +64,7 @@ struct nodo_hash **rehash(struct nodo_hash **tabla_vieja, size_t tamanio)
 
 	for(int i = 0; i < tamanio; i++){
 		struct nodo_hash *actual = tabla_vieja[i];
-		
+
 		while(actual){
 			size_t clave_hasheada = hashear_clave(actual->clave) % (nuevo_tamanio);
 
@@ -94,7 +95,7 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 		hash->capacidad *= INCREMENTO_CAPACIDAD;
 
 		free(hash->tabla);
-		
+
 		hash->tabla = nueva_tabla;
 	}
 
@@ -107,7 +108,7 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 		return NULL;
 	}
 	strcpy(nuevo_nodo->clave, clave);
-	
+
 	nuevo_nodo->elemento = elemento;
 
 	size_t clave_hasheada = hashear_clave(clave) % hash->capacidad;
@@ -130,11 +131,11 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 
 			actual = actual->siguiente;
 		}
-		
+
 		nuevo_nodo->siguiente = hash->tabla[clave_hasheada];
 		hash->tabla[clave_hasheada] = nuevo_nodo;
 	}
-	
+
 	hash->ocupados += 1;
 	if(anterior) *anterior = NULL;
 
@@ -144,7 +145,7 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 void *hash_quitar(hash_t *hash, const char *clave)
 {
 	if(!hash) return NULL;
-	
+
 	if(!clave) return NULL;
 
 	size_t clave_hasheada = hashear_clave(clave) % hash->capacidad;
@@ -172,7 +173,7 @@ void *hash_quitar(hash_t *hash, const char *clave)
 
 				elemento = actual->elemento;
 				hash->ocupados--;
-				
+
 				free(actual->clave);
 				free(actual);
 
@@ -190,9 +191,9 @@ void *hash_quitar(hash_t *hash, const char *clave)
 void *hash_obtener(hash_t *hash, const char *clave)
 {
 	if(!hash) return NULL;
-	
+
 	if(!clave) return NULL;
-	
+
 	size_t clave_hasheada = hashear_clave(clave) % hash->capacidad;
 	void *elemento = NULL;
 
@@ -213,9 +214,9 @@ void *hash_obtener(hash_t *hash, const char *clave)
 bool hash_contiene(hash_t *hash, const char *clave)
 {
 	if(!hash) return NULL;
-	
+
 	if(!clave) return NULL;
-	
+
 	size_t clave_hasheada = hashear_clave(clave) % hash->capacidad;
 
 	struct nodo_hash *actual = hash->tabla[clave_hasheada];
@@ -278,7 +279,7 @@ void hash_destruir_todo(hash_t *hash, void (*destructor)(void *))
 	}
 
 	free(hash->tabla);
-	
+
 	free(hash);
 }
 
