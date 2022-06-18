@@ -299,9 +299,7 @@ size_t hash_con_cada_clave(hash_t *hash,
 		while(actual){
 			claves_iteradas++;
 
-			if(f(actual->clave, actual->elemento, aux) == PARAR_ITERACION){
-				return claves_iteradas;
-			}
+			if(f(actual->clave, actual->elemento, aux) == PARAR_ITERACION) return claves_iteradas;
 
 			actual = actual->siguiente;
 		}
