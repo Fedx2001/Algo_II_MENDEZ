@@ -12,7 +12,6 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-
 	sala_destruir(sala);
 
 	return 0;
