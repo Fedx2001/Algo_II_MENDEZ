@@ -3,8 +3,10 @@ CFLAGS=-g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O2
 CC = gcc
 DEMO_OBJETOS=ejemplo/objetos.txt
 DEMO_INTERACCIONES=ejemplo/interacciones.txt
+CUSTOM_OBJETOS=custom/objetos.dat
+CUSTOM_INTERACCIONES=custom/interacciones.dat
 
-all: clean valgrind-demo
+all: clean valgrind-pruebas
 
 
 pruebas: src/*.c pruebas.c
@@ -13,11 +15,20 @@ pruebas: src/*.c pruebas.c
 valgrind-pruebas: pruebas
 	valgrind $(VFLAGS) ./pruebas.o
 
-demo: escape_pokemon.c src/*.c
-	$(CC) $(CFLAGS) escape_pokemon.c src/*.c -o demo.o
+juego: escape_pokemon.c src/*.c
+	$(CC) $(CFLAGS) escape_pokemon.c src/*.c -o juego.o
 
-valgrind-demo: demo
-	valgrind $(VFLAGS) ./demo.o $(DEMO_OBJETOS) $(DEMO_INTERACCIONES)
+valgrind-demo: juego
+	valgrind $(VFLAGS) ./juego.o $(DEMO_OBJETOS) $(DEMO_INTERACCIONES)
+
+demo: juego
+	./juego.o $(DEMO_OBJETOS) $(DEMO_INTERACCIONES)
+
+valgrind-custom: juego
+	valgrind $(VFLAGS) ./juego.o $(CUSTOM_OBJETOS) $(CUSTOM_INTERACCIONES)
+
+custom: juego
+	./juego.o $(CUSTOM_OBJETOS) $(CUSTOM_INTERACCIONES)
 
 clean:
-	rm -f sala pruebas
+	rm -f sala pruebas.o juego.o
