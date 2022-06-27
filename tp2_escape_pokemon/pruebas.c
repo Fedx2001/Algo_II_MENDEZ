@@ -262,9 +262,7 @@ void pruebas_escape_exitoso()
 	bool agarrado = sala_agarrar_objeto(sala, "pokebola");
 	int ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "pokebola", "", NULL, NULL);
 
-	pa2m_afirmar(agarrado, "Pude agarrar un objeto");
-	pa2m_afirmar(ejecutadas == 1, "Se pudo ejecutar la interaccion para escapar");
-	pa2m_afirmar(sala_escape_exitoso(sala), 
+	pa2m_afirmar(agarrado && ejecutadas == 1 && sala_escape_exitoso(sala), 
 		     "Se realizo un escape exitoso de la sala ejecutando la interaccion adecuada");
 	
 	sala_destruir(sala);
