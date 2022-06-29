@@ -195,9 +195,11 @@ bool sala_agarrar_objeto(sala_t *sala, const char *nombre_objeto)
 {
 	if(!sala || !nombre_objeto) return ERROR;
 
-	struct objeto *objeto = hash_quitar(sala->objetos_conocidos, nombre_objeto);
+	struct objeto *objeto = hash_obtener(sala->objetos_conocidos, nombre_objeto);
 
 	if(!objeto || !objeto->es_asible) return ERROR;
+
+	objeto = hash_quitar(sala->objetos_conocidos, nombre_objeto);
 
 	hash_insertar(sala->objetos_poseidos, objeto->nombre, objeto, NULL);
 
@@ -216,6 +218,8 @@ char* sala_describir_objeto(sala_t *sala, const char *nombre_objeto)
 
 	return NULL;
 }
+
+
 
 int sala_ejecutar_interaccion(sala_t *sala, const char *verbo,
 			      const char *objeto1, const char *objeto2,
@@ -249,20 +253,32 @@ int sala_ejecutar_interaccion(sala_t *sala, const char *verbo,
 				}
 				break;
 			case DESCUBRIR_OBJETO:{
-				struct objeto *objeto = hash_obtener(sala->objetos, interaccion->accion.objeto);
+				if(hash_contiene(sala->objetos_conocidos, interaccion->accion.objeto) ||
+				   hash_contiene(sala->objetos_poseidos, interaccion->accion.objeto)){
+					break;
+				} else {
+					if(((struct objeto *)hash_obtener(sala->objetos, objeto1))->es_asible
+					   && !hash_contiene(sala->objetos_poseidos, objeto1)){
+						break;
+					}
 
-				bool es_poseido = hash_contiene(sala->objetos_poseidos, interaccion->accion.objeto);
-				bool es_conocido = hash_contiene(sala->objetos_conocidos, interaccion->accion.objeto);
+					printf("No tengo nada\n");
 
-				if(objeto && !es_poseido && !es_conocido){
+					struct objeto *objeto = hash_obtener(sala->objetos, interaccion->accion.objeto);
 					hash_insertar(sala->objetos_conocidos, objeto->nombre, objeto, NULL);
+					
 					if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
+					
 					cantidad_ejecutadas++;
 				}
-
 				break;
 			}
 			case REEMPLAZAR_OBJETO:{
+				if(((struct objeto *)hash_obtener(sala->objetos, objeto1))->es_asible
+				   && !hash_contiene(sala->objetos_poseidos, objeto1)){
+					break;
+				}
+
 				struct objeto *nuevo = hash_obtener(sala->objetos, interaccion->accion.objeto);
 
 				if(nuevo){
@@ -279,36 +295,46 @@ int sala_ejecutar_interaccion(sala_t *sala, const char *verbo,
 				break;
 			}
 			case ELIMINAR_OBJETO:{
-				struct objeto *a_quitar = hash_quitar(sala->objetos_conocidos, objeto2);
+				if(((struct objeto *)hash_obtener(sala->objetos, objeto1))->es_asible
+				   && !hash_contiene(sala->objetos_poseidos, objeto1)){
+					break;
+				}
+
+				struct objeto *a_quitar = hash_quitar(sala->objetos_poseidos, objeto1);
 				if(!a_quitar){
-					a_quitar = hash_quitar(sala->objetos_poseidos, objeto2);
+					a_quitar = hash_quitar(sala->objetos_conocidos, objeto1);
+
 					if(!a_quitar) break;
 				}
 				
-				if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
-
 				cantidad_ejecutadas++;
+
+				if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
 
 				break;
 			}
 			case ESCAPAR:
-				sala->escape_exitoso = true;
-				
-				if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
-				
-				cantidad_ejecutadas += 1;
+				if(((struct objeto *)hash_obtener(sala->objetos, objeto1))->es_asible
+				   && !hash_contiene(sala->objetos_poseidos, objeto1)){
+					break;
+				}
 
+				if(hash_contiene(sala->objetos_conocidos, objeto1) ||
+				   hash_contiene(sala->objetos_poseidos, objeto1)){
+					sala->escape_exitoso = true;
+				
+					if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
+					
+					cantidad_ejecutadas += 1;
+				}
 				break;
 			case ACCION_INVALIDA:
-				if(mostrar_mensaje && mensaje) mostrar_mensaje("No tengo ni idea de lo que queres hacer", tipo, aux);
 				break;
 			}
 		}
 	}
 
 	lista_iterador_destruir(it);
-
-	if(cantidad_ejecutadas == 0 && mostrar_mensaje) mostrar_mensaje("Nada interesante alcanza tu vista", ACCION_INVALIDA, aux);
 
 	return cantidad_ejecutadas;
 }
