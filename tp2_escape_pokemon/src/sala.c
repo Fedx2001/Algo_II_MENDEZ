@@ -219,7 +219,120 @@ char* sala_describir_objeto(sala_t *sala, const char *nombre_objeto)
 	return NULL;
 }
 
+/*
+ * Recibe una interaccion y realiza la accion correspondiente a la interaccion si
+ * no fue realizada previamente.
+ * 
+ * Si la accion de la interaccion es invalida, no hace nada.
+ * 
+ * Si la interaccion se ejecutó correctamente, incrementa la cantidad de interacciones ejecutadas.
+ */
+void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *cantidad_ejecutadas, 
+			  void (*mostrar_mensaje)(const char *mensaje,
+						  enum tipo_accion accion,
+						  void *aux),
+			  void *aux)
+{
+	if(!sala || !a_ejecutar || !cantidad_ejecutadas) return;
+	
+	enum tipo_accion tipo = a_ejecutar->accion.tipo;
+	char *mensaje = a_ejecutar->accion.mensaje;
 
+	char *objeto_principal = a_ejecutar->objeto;
+	char *objeto_parametro = a_ejecutar->objeto_parametro;
+	char *objeto_accion = a_ejecutar->accion.objeto;
+
+	switch(tipo){
+	case MOSTRAR_MENSAJE:
+		if(mostrar_mensaje && mensaje){
+			mostrar_mensaje(mensaje, tipo, aux);
+			(*cantidad_ejecutadas)++;
+		}
+		break;
+	case DESCUBRIR_OBJETO:
+		if(hash_contiene(sala->objetos_conocidos, objeto_accion) ||
+			hash_contiene(sala->objetos_poseidos, objeto_accion)){
+			break;
+		} else {
+			if(((struct objeto *)hash_obtener(sala->objetos, objeto_principal))->es_asible
+				&& !hash_contiene(sala->objetos_poseidos, objeto_principal)){
+				break;
+			}
+
+			struct objeto *objeto = hash_obtener(sala->objetos, objeto_accion);
+			if(!objeto) break;
+			
+			hash_t *resultado = hash_insertar(sala->objetos_conocidos, objeto->nombre, objeto, NULL);
+			if(!resultado) break;
+
+			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
+			
+			(*cantidad_ejecutadas)++;
+		}
+		break;
+	case REEMPLAZAR_OBJETO:
+		if(((struct objeto *)hash_obtener(sala->objetos, objeto_principal))->es_asible
+			&& !hash_contiene(sala->objetos_poseidos, objeto_principal)){
+			break;
+		} else {
+			struct objeto *nuevo = hash_obtener(sala->objetos, objeto_accion);
+			struct objeto *viejo = hash_quitar(sala->objetos_conocidos, objeto_parametro);
+			if(!viejo || !nuevo) break;
+			
+			hash_t *resultado = hash_insertar(sala->objetos_conocidos, nuevo->nombre, nuevo, NULL);
+			if(!resultado) break;
+			
+			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
+			
+			(*cantidad_ejecutadas)++;
+		}
+
+		break;
+	case ELIMINAR_OBJETO:
+		if(((struct objeto *)hash_obtener(sala->objetos, objeto_principal))->es_asible
+			&& !hash_contiene(sala->objetos_poseidos, objeto_principal)){
+			break;
+		} else {
+			struct objeto *quitado = hash_quitar(sala->objetos, objeto_principal);
+			if(!quitado) break;
+
+			hash_quitar(sala->objetos_conocidos, objeto_principal);
+			hash_quitar(sala->objetos_poseidos, objeto_principal);
+			
+			free(quitado);
+
+			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
+
+			(*cantidad_ejecutadas)++;
+
+			break;
+		}
+	case ESCAPAR:
+		if(((struct objeto *)hash_obtener(sala->objetos, objeto_principal))->es_asible
+			&& !hash_contiene(sala->objetos_poseidos, objeto_principal)){
+			break;
+		}
+
+		if(hash_contiene(sala->objetos_conocidos, objeto_principal) ||
+			hash_contiene(sala->objetos_poseidos, objeto_principal)){
+			sala->escape_exitoso = true;
+		
+			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
+			
+			(*cantidad_ejecutadas)++;
+		}
+		break;
+	case ACCION_INVALIDA:
+		break;
+	}
+}
+
+/*
+ * Recibe dos interacciones no nulas, compara sus objetos y verbos y 
+ * devuelve 0 si la interaccion a comparar tiene los mismos objetos y verbos
+ * que otra interacción y -1 en caso que no sea asi.
+ */
+int comparar_interacciones(void *interaccion_comparada, void *interaccion_a_comparar);
 
 int sala_ejecutar_interaccion(sala_t *sala, const char *verbo,
 			      const char *objeto1, const char *objeto2,
@@ -232,106 +345,21 @@ int sala_ejecutar_interaccion(sala_t *sala, const char *verbo,
 
 	if(!sala || !verbo || !objeto1) return cantidad_ejecutadas;
 
+	struct interaccion a_comparar;
+	
+	strcpy(a_comparar.verbo, verbo);
+	strcpy(a_comparar.objeto, objeto1);
+	
+	if(!objeto2) strcpy(a_comparar.objeto_parametro, "_");
+	else strcpy(a_comparar.objeto_parametro, objeto2);
+
 	lista_iterador_t *it = lista_iterador_crear(sala->interacciones);
 
 	for(; lista_iterador_tiene_siguiente(it); lista_iterador_avanzar(it)){
-		struct interaccion *interaccion = lista_iterador_elemento_actual(it);
+		struct interaccion *actual = lista_iterador_elemento_actual(it);
 
-		int cmp_verbo = strcmp(verbo, interaccion->verbo);
-		int cmp_objeto1 = strcmp(objeto1, interaccion->objeto);
-		int cmp_objeto2 = strcmp(objeto2, interaccion->objeto_parametro);
-
-		if(cmp_verbo == COMPARACION_EXITO && cmp_objeto1 == COMPARACION_EXITO && cmp_objeto2 == COMPARACION_EXITO){
-			char *mensaje = interaccion->accion.mensaje;
-			enum tipo_accion tipo = interaccion->accion.tipo;
-
-			switch(tipo){
-			case MOSTRAR_MENSAJE:
-				if(mostrar_mensaje && mensaje){
-					mostrar_mensaje(mensaje, tipo, aux);
-					cantidad_ejecutadas++;
-				}
-				break;
-			case DESCUBRIR_OBJETO:{
-				if(hash_contiene(sala->objetos_conocidos, interaccion->accion.objeto) ||
-				   hash_contiene(sala->objetos_poseidos, interaccion->accion.objeto)){
-					break;
-				} else {
-					if(((struct objeto *)hash_obtener(sala->objetos, objeto1))->es_asible
-					   && !hash_contiene(sala->objetos_poseidos, objeto1)){
-						break;
-					}
-
-					printf("No tengo nada\n");
-
-					struct objeto *objeto = hash_obtener(sala->objetos, interaccion->accion.objeto);
-					hash_insertar(sala->objetos_conocidos, objeto->nombre, objeto, NULL);
-					
-					if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
-					
-					cantidad_ejecutadas++;
-				}
-				break;
-			}
-			case REEMPLAZAR_OBJETO:{
-				if(((struct objeto *)hash_obtener(sala->objetos, objeto1))->es_asible
-				   && !hash_contiene(sala->objetos_poseidos, objeto1)){
-					break;
-				}
-
-				struct objeto *nuevo = hash_obtener(sala->objetos, interaccion->accion.objeto);
-
-				if(nuevo){
-					struct objeto *objeto_viejo = hash_quitar(sala->objetos_conocidos, objeto2);
-					if(!objeto_viejo) break;
-					
-					hash_insertar(sala->objetos_conocidos, nuevo->nombre, nuevo, NULL);
-					
-					if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
-					
-					cantidad_ejecutadas++;
-				}
-
-				break;
-			}
-			case ELIMINAR_OBJETO:{
-				if(((struct objeto *)hash_obtener(sala->objetos, objeto1))->es_asible
-				   && !hash_contiene(sala->objetos_poseidos, objeto1)){
-					break;
-				}
-
-				struct objeto *a_quitar = hash_quitar(sala->objetos_poseidos, objeto1);
-				if(!a_quitar){
-					a_quitar = hash_quitar(sala->objetos_conocidos, objeto1);
-
-					if(!a_quitar) break;
-				}
-				
-				cantidad_ejecutadas++;
-
-				if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
-
-				break;
-			}
-			case ESCAPAR:
-				if(((struct objeto *)hash_obtener(sala->objetos, objeto1))->es_asible
-				   && !hash_contiene(sala->objetos_poseidos, objeto1)){
-					break;
-				}
-
-				if(hash_contiene(sala->objetos_conocidos, objeto1) ||
-				   hash_contiene(sala->objetos_poseidos, objeto1)){
-					sala->escape_exitoso = true;
-				
-					if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
-					
-					cantidad_ejecutadas += 1;
-				}
-				break;
-			case ACCION_INVALIDA:
-				break;
-			}
-		}
+		if(comparar_interacciones(actual, &a_comparar) == COMPARACION_EXITO)
+			ejecutar_interaccion(sala, actual, &cantidad_ejecutadas, mostrar_mensaje, aux);
 	}
 
 	lista_iterador_destruir(it);
@@ -339,21 +367,19 @@ int sala_ejecutar_interaccion(sala_t *sala, const char *verbo,
 	return cantidad_ejecutadas;
 }
 
-/*
- * Recibe dos interacciones no nulas, compara sus objetos y verbos y 
- * devuelve 0 si la interaccion a comparar tiene los mismos objetos y verbos
- * que otra interacción y -1 en caso que no sea asi.
- */
-int es_interaccion_valida(void *inter_actual, void *inter_a_comparar)
+int comparar_interacciones(void *interaccion_comparada, void *interaccion_a_comparar)
 {
-	struct interaccion *actual = inter_actual;
-	struct interaccion *a_comparar = inter_a_comparar;
+	struct interaccion *actual = interaccion_comparada;
+	struct interaccion *a_comparar = interaccion_a_comparar;
 	
 	int comparacion_verbo = strcmp(actual->verbo, a_comparar->verbo);
 	int comparacion_objeto1 = strcmp(actual->objeto, a_comparar->objeto);
 	int comparacion_objeto2 = strcmp(actual->objeto_parametro, a_comparar->objeto_parametro);		
 
-	if(comparacion_verbo == 0 && comparacion_objeto1 == 0 && comparacion_objeto2 == 0) 
+	if(comparacion_verbo == COMPARACION_EXITO && 
+	   comparacion_objeto1 == COMPARACION_EXITO && 
+	   comparacion_objeto2 == COMPARACION_EXITO
+	) 
 		return COMPARACION_EXITO;
 
 	return COMPARACION_ERROR;
@@ -368,10 +394,11 @@ bool sala_es_interaccion_valida(sala_t *sala, const char *verbo, const char *obj
 	
 	strcpy(a_comparar.verbo, verbo);
 	strcpy(a_comparar.objeto, objeto1);
+	
 	if(!objeto2) strcpy(a_comparar.objeto_parametro, "_");
 	else strcpy(a_comparar.objeto_parametro, objeto2);
 
-	void *encontrada = lista_buscar_elemento(sala->interacciones, es_interaccion_valida, &a_comparar);
+	void *encontrada = lista_buscar_elemento(sala->interacciones, comparar_interacciones, &a_comparar);
 
 	return encontrada != NULL ? INTERACCION_VALIDA : INTERACCION_INVALIDA;
 }
