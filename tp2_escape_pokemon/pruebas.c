@@ -1,6 +1,7 @@
 #include "pa2mm.h"
 #include "src/estructuras.h"
 #include "src/sala.h"
+#include "src/estructura_sala.h"
 #include "src/objeto.h"
 #include "src/interaccion.h"
 
@@ -101,8 +102,8 @@ void pruebas_crear_sala()
 
 	pa2m_afirmar(sala != NULL, "Puedo crear la sala a partir de archivos no vacíos");
 
-	// pa2m_afirmar(sala->cantidad_objetos == 9, "Se leyeron 9 objetos");
-	// pa2m_afirmar(sala->cantidad_interacciones == 9, "Se leyeron 9 interacciones");
+	pa2m_afirmar(hash_cantidad(sala->objetos) == 9, "Se leyeron 9 objetos");
+	pa2m_afirmar(lista_tamanio(sala->interacciones) == 9, "Se leyeron 9 interacciones");
 
 	sala_destruir(sala);
 }
@@ -146,16 +147,16 @@ void pruebas_agarrar_objetos()
 {
 	pa2m_afirmar(!sala_agarrar_objeto(NULL, "pokebola"), "No puedo agarrar un objeto de una sala que no existe");
 
-	sala_t *sala = sala_crear_desde_archivos("test_scene/objs.txt", "test_scene/inters.txt");
+	sala_t *sala = sala_crear_desde_archivos("test_scene/objetos.txt", "test_scene/interacciones.txt");
 	pa2m_afirmar(!sala_agarrar_objeto(sala, NULL), "No puedo agarrar un objeto NULL de una sala");
 
-	pa2m_afirmar(!sala_agarrar_objeto(sala, "camiseta"), "No puedo agarrar un objeto que no existe en la sala");
-	
+	pa2m_afirmar(!sala_agarrar_objeto(sala, "mesa"), "No puedo agarrar un objeto que no existe en la sala");
+
 	pa2m_afirmar(!sala_agarrar_objeto(sala, "llave"), "No puedo agarrar un objeto que no conozco");
 
 	pa2m_afirmar(sala_agarrar_objeto(sala, "pokebola"), "Puedo agarrar un objeto que conozco");
-	pa2m_afirmar(!sala_agarrar_objeto(sala, "pokebola"), 
-		     "No puedo volver a agarrar el objeto (está en los poseidos, no?)");
+
+	pa2m_afirmar(!sala_agarrar_objeto(sala, "pokebola"), "No puedo volver a agarrar el  mismo objeto");
 
 	sala_destruir(sala);
 }
@@ -180,7 +181,7 @@ void pruebas_nombre_objetos_conocidos()
 
 	const char esperado[] = "habitacion";
 
-	pa2m_afirmar(strcmp(objetos2[0], esperado) == 0 && cantidad == 1,
+	pa2m_afirmar(strcmp(objetos2[cantidad-1], esperado) == 0,
 		     "Todos los nombres de objeto son los esperados (SÍ, ME AFANÉ TUS PRUEBAS)");
 
 	free(objetos);
@@ -204,6 +205,7 @@ void pruebas_nombre_objetos_poseidos()
 	char **objetos2 = sala_obtener_nombre_objetos_poseidos(sala, &cantidad);
 	pa2m_afirmar(objetos2 != NULL,
 		     "Puedo pedir el vector de nombres poseidos a la sala pasando cantidad no NULL");
+	
 	pa2m_afirmar(cantidad == 0, "Una sala recién creada no tiene objetos poseidos");
 
 	free(objetos);
@@ -247,7 +249,7 @@ void pruebas_describir_objeto()
 
 	char *descripcion = sala_describir_objeto(sala, "habitacion");
 	pa2m_afirmar(descripcion, "Puedo describir un objeto conocido");
-	
+
 	int comparacion = strcmp(descripcion, "Una habitación de la que no podes escapar");
 
 	pa2m_afirmar(comparacion == 0, "La descripcion es la esperada");
@@ -267,13 +269,13 @@ void mostrar_mensaje(const char *mensaje, enum tipo_accion accion, void *aux)
 }
 
 void pruebas_ejecutar_interaccion()
-{	
+{
 	sala_t *sala = sala_crear_desde_archivos("ejemplo/objetos.txt", "ejemplo/interacciones.txt");
 
 	struct cantidad_acciones_y_tipo aux;
 	aux.accion = REEMPLAZAR_OBJETO;
 	aux.cantidad_ejecutadas = 0;
-	
+
 	int ejecutadas = 0;
 
 	ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "llave", "puerta", mostrar_mensaje, &aux);
@@ -285,14 +287,14 @@ void pruebas_ejecutar_interaccion()
 	ejecutadas = sala_ejecutar_interaccion(sala, "examinar", "habitacion", "", mostrar_mensaje, &aux);
 
 	pa2m_afirmar(ejecutadas == 2, "Examino la habitacion y ejecuto dos interacciones");
-	pa2m_afirmar(aux.cantidad_ejecutadas == 2, 
+	pa2m_afirmar(aux.cantidad_ejecutadas == 2,
 		     "Se llamo a mostrar mensaje dos veces con el tipo de accion DESCUBRIR");
 
 	int cantidad = 0;
 
 	char **objetos_conocidos1 = sala_obtener_nombre_objetos_conocidos(sala, &cantidad);
 	int comparaciones_exitosas = 0;
-	
+
 	if(strcmp(objetos_conocidos1[0], "pokebola") == 0) comparaciones_exitosas++;
 	if(strcmp(objetos_conocidos1[1], "habitacion") == 0) comparaciones_exitosas++;
 	if(strcmp(objetos_conocidos1[2], "puerta") == 0) comparaciones_exitosas++;
@@ -302,20 +304,43 @@ void pruebas_ejecutar_interaccion()
 
 	aux.cantidad_ejecutadas = 0;
 	ejecutadas = sala_ejecutar_interaccion(sala, "examinar", "habitacion", "", mostrar_mensaje, &aux);
-	
+
 	pa2m_afirmar(ejecutadas == 0, "Examino la habitacion de nuevo y no descubro nada");
-	pa2m_afirmar(aux.cantidad_ejecutadas == 0, 
+	pa2m_afirmar(aux.cantidad_ejecutadas == 0,
 		     "No se llamo a mostrar mensaje");
 
-	ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "pokebola", "", mostrar_mensaje, &aux);
+	ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "pokebola", "", NULL, NULL);
 	pa2m_afirmar(ejecutadas == 0, "No puedo abrir la pokebola (No la tengo)");
 
-	ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "llave", "puerta", mostrar_mensaje, &aux);
+	ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "llave", "puerta", NULL, NULL);
 	pa2m_afirmar(ejecutadas == 0, "No puedo abrir la puerta con la llave (No conozco la llave)");
 
-	ejecutadas = sala_ejecutar_interaccion(sala, "salir", "puerta-abierta", "", mostrar_mensaje, &aux);
-	pa2m_afirmar(ejecutadas == 0, 
+	ejecutadas = sala_ejecutar_interaccion(sala, "salir", "puerta-abierta", "", NULL, NULL);
+	pa2m_afirmar(ejecutadas == 0,
 		     "No puedo salir por la puerta abierta (PORQUE NO DEBERÍA ESTAR ABIERTA >:|)");
+
+	bool agarrado = sala_agarrar_objeto(sala, "pokebola");
+	pa2m_afirmar(agarrado, "Agarré la pokébola");
+
+	ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "pokebola", "", NULL, NULL);
+	pa2m_afirmar(ejecutadas == 2, "Abrí la pokébola y se eliminó de la sala");
+
+	ejecutadas = sala_ejecutar_interaccion(sala, "examinar", "habitacion", "", mostrar_mensaje, &aux);
+	pa2m_afirmar(ejecutadas == 0, "Examinar la habitación de nuevo no descubre la pokébola (fue eliminada)");
+
+	ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "llave", "puerta", NULL, NULL);
+	pa2m_afirmar(ejecutadas == 0, "No puedo abrir la puerta con la llave (No tengo la llave)");
+
+	agarrado = sala_agarrar_objeto(sala, "llave");
+	pa2m_afirmar(agarrado, "Agarré la llave");
+
+	ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "llave", "puerta", NULL, NULL);
+	pa2m_afirmar(ejecutadas == 1, "Abrí la puerta con la llave");
+	pa2m_afirmar(!sala_escape_exitoso(sala), "Todavía no ocurrió un escape exitoso");
+
+	ejecutadas = sala_ejecutar_interaccion(sala, "salir", "puerta-abierta", "", NULL, NULL);
+	pa2m_afirmar(ejecutadas == 1, "Me escapé de la sala");
+	pa2m_afirmar(sala_escape_exitoso(sala), "Se actualizó el estado del escape a escape exitoso");
 
 	free(objetos_conocidos1);
 	sala_destruir(sala);
@@ -327,15 +352,15 @@ void pruebas_escape_exitoso()
 
 	sala_t *sala = sala_crear_desde_archivos("test_scene/objs.txt", "test_scene/inters.txt");
 
-	pa2m_afirmar(!sala_escape_exitoso(sala), 
+	pa2m_afirmar(!sala_escape_exitoso(sala),
 		     "No se realizo un escape exitoso de una sala recien creada");
 
 	bool agarrado = sala_agarrar_objeto(sala, "pokebola");
 	int ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "pokebola", "", NULL, NULL);
 
-	pa2m_afirmar(agarrado && ejecutadas == 1 && sala_escape_exitoso(sala), 
+	pa2m_afirmar(agarrado && ejecutadas == 1 && sala_escape_exitoso(sala),
 		     "Se realizo un escape exitoso de la sala ejecutando la interaccion adecuada");
-	
+
 	sala_destruir(sala);
 }
 
@@ -368,7 +393,7 @@ int main()
 	pa2m_nuevo_grupo("Pruebas de describir objetos");
 	pruebas_describir_objeto();
 
-	pa2m_nuevo_grupo("Pruebas de ejecutar interaccion");
+	pa2m_nuevo_grupo("Pruebas de ejecutar interaccion (en realidad me afane el ejecutar el escenario de ejemplo de Chanu jejejeje)");
 	pruebas_ejecutar_interaccion();
 
 	pa2m_nuevo_grupo("Pruebas de escape exitoso");
