@@ -4,6 +4,7 @@
 #include "interaccion.h"
 #include "lista.h"
 #include "hash.h"
+#include "funciones_auxiliares.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -104,11 +105,6 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 	return sala;
 }
 
-/*
- * Recibe un nombre de objeto, un objeto y un contenedor con un vector y la cantidad
- * de elementos del mismo, e inserta los nombres de objetos de un hash en el vector
- * del contenedor.
-*/
 bool agregar_nombres_en_vector(const char *nombre_objeto, void *objeto, void *contenedor)
 {
 	struct aux *aux = contenedor;
@@ -219,14 +215,6 @@ char* sala_describir_objeto(sala_t *sala, const char *nombre_objeto)
 	return NULL;
 }
 
-/*
- * Recibe una interaccion y realiza la accion correspondiente a la interaccion si
- * no fue realizada previamente.
- * 
- * Si la accion de la interaccion es invalida, no hace nada.
- * 
- * Si la interaccion se ejecutó correctamente, incrementa la cantidad de interacciones ejecutadas.
- */
 void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *cantidad_ejecutadas, 
 			  void (*mostrar_mensaje)(const char *mensaje,
 						  enum tipo_accion accion,
@@ -244,14 +232,17 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 
 	switch(tipo){
 	case MOSTRAR_MENSAJE:
-		if(mostrar_mensaje && mensaje){
-			mostrar_mensaje(mensaje, tipo, aux);
-			(*cantidad_ejecutadas)++;
+		if(hash_contiene(sala->objetos_conocidos, objeto_principal) || 
+		   hash_contiene(sala->objetos_poseidos, objeto_principal)){
+			if(mostrar_mensaje && mensaje){
+				mostrar_mensaje(mensaje, MOSTRAR_MENSAJE, aux);
+				(*cantidad_ejecutadas)++;
+			}
 		}
 		break;
 	case DESCUBRIR_OBJETO:
 		if(hash_contiene(sala->objetos_conocidos, objeto_accion) ||
-			hash_contiene(sala->objetos_poseidos, objeto_accion)){
+		   hash_contiene(sala->objetos_poseidos, objeto_accion)){
 			break;
 		} else {
 			if(((struct objeto *)hash_obtener(sala->objetos, objeto_principal))->es_asible
@@ -265,7 +256,7 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 			hash_t *resultado = hash_insertar(sala->objetos_conocidos, objeto->nombre, objeto, NULL);
 			if(!resultado) break;
 
-			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
+			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, DESCUBRIR_OBJETO, aux);
 			
 			(*cantidad_ejecutadas)++;
 		}
@@ -276,13 +267,19 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 			break;
 		} else {
 			struct objeto *nuevo = hash_obtener(sala->objetos, objeto_accion);
-			struct objeto *viejo = hash_quitar(sala->objetos_conocidos, objeto_parametro);
+			struct objeto *viejo = hash_quitar(sala->objetos, objeto_parametro);
+			
 			if(!viejo || !nuevo) break;
+			
+			hash_quitar(sala->objetos_conocidos, objeto_parametro);
+			hash_quitar(sala->objetos_poseidos, objeto_parametro);
+
+			free(viejo);
 			
 			hash_t *resultado = hash_insertar(sala->objetos_conocidos, nuevo->nombre, nuevo, NULL);
 			if(!resultado) break;
 			
-			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
+			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, REEMPLAZAR_OBJETO, aux);
 			
 			(*cantidad_ejecutadas)++;
 		}
@@ -301,23 +298,18 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 			
 			free(quitado);
 
-			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
+			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, ELIMINAR_OBJETO, aux);
 
 			(*cantidad_ejecutadas)++;
 
 			break;
 		}
 	case ESCAPAR:
-		if(((struct objeto *)hash_obtener(sala->objetos, objeto_principal))->es_asible
-			&& !hash_contiene(sala->objetos_poseidos, objeto_principal)){
-			break;
-		}
-
 		if(hash_contiene(sala->objetos_conocidos, objeto_principal) ||
-			hash_contiene(sala->objetos_poseidos, objeto_principal)){
+		   hash_contiene(sala->objetos_poseidos, objeto_principal)){
 			sala->escape_exitoso = true;
 		
-			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, tipo, aux);
+			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, ESCAPAR, aux);
 			
 			(*cantidad_ejecutadas)++;
 		}
@@ -327,12 +319,25 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 	}
 }
 
-/*
- * Recibe dos interacciones no nulas, compara sus objetos y verbos y 
- * devuelve 0 si la interaccion a comparar tiene los mismos objetos y verbos
- * que otra interacción y -1 en caso que no sea asi.
- */
-int comparar_interacciones(void *interaccion_comparada, void *interaccion_a_comparar);
+int comparar_interacciones(void *interaccion_comparada, void *interaccion_a_comparar)
+{
+	if(!interaccion_comparada || !interaccion_a_comparar) return COMPARACION_ERROR;
+
+	struct interaccion *actual = interaccion_comparada;
+	struct interaccion *a_comparar = interaccion_a_comparar;
+	
+	int comparacion_verbo = strcmp(actual->verbo, a_comparar->verbo);
+	int comparacion_objeto1 = strcmp(actual->objeto, a_comparar->objeto);
+	int comparacion_objeto2 = strcmp(actual->objeto_parametro, a_comparar->objeto_parametro);		
+
+	if(comparacion_verbo == COMPARACION_EXITO && 
+	   comparacion_objeto1 == COMPARACION_EXITO && 
+	   comparacion_objeto2 == COMPARACION_EXITO
+	) 
+		return COMPARACION_EXITO;
+
+	return COMPARACION_ERROR;
+}
 
 int sala_ejecutar_interaccion(sala_t *sala, const char *verbo,
 			      const char *objeto1, const char *objeto2,
@@ -358,31 +363,14 @@ int sala_ejecutar_interaccion(sala_t *sala, const char *verbo,
 	for(; lista_iterador_tiene_siguiente(it); lista_iterador_avanzar(it)){
 		struct interaccion *actual = lista_iterador_elemento_actual(it);
 
-		if(comparar_interacciones(actual, &a_comparar) == COMPARACION_EXITO)
+		if(comparar_interacciones(actual, &a_comparar) == COMPARACION_EXITO){
 			ejecutar_interaccion(sala, actual, &cantidad_ejecutadas, mostrar_mensaje, aux);
+		}
 	}
 
 	lista_iterador_destruir(it);
 
 	return cantidad_ejecutadas;
-}
-
-int comparar_interacciones(void *interaccion_comparada, void *interaccion_a_comparar)
-{
-	struct interaccion *actual = interaccion_comparada;
-	struct interaccion *a_comparar = interaccion_a_comparar;
-	
-	int comparacion_verbo = strcmp(actual->verbo, a_comparar->verbo);
-	int comparacion_objeto1 = strcmp(actual->objeto, a_comparar->objeto);
-	int comparacion_objeto2 = strcmp(actual->objeto_parametro, a_comparar->objeto_parametro);		
-
-	if(comparacion_verbo == COMPARACION_EXITO && 
-	   comparacion_objeto1 == COMPARACION_EXITO && 
-	   comparacion_objeto2 == COMPARACION_EXITO
-	) 
-		return COMPARACION_EXITO;
-
-	return COMPARACION_ERROR;
 }
 
 bool sala_es_interaccion_valida(sala_t *sala, const char *verbo, const char *objeto1,
