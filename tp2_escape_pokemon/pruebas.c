@@ -171,7 +171,7 @@ void pruebas_nombre_objetos_conocidos()
 		     "No puedo obtener los nombres de objetos conocidos de una sala NULL");
 	pa2m_afirmar(cantidad == -1, "La cantidad es -1 luego de invocar a la función");
 
-	sala_t *sala = sala_crear_desde_archivos("chanu/obj.dat", "chanu/int.csv");
+	sala_t *sala = sala_crear_desde_archivos("ejemplo/objetos.txt", "ejemplo/interacciones.txt");
 
 	char **objetos = sala_obtener_nombre_objetos_conocidos(sala, NULL);
 	pa2m_afirmar(objetos != NULL,
@@ -182,10 +182,10 @@ void pruebas_nombre_objetos_conocidos()
 		     "Puedo pedir el vector de nombres conocidos a la sala pasando cantidad no NULL");
 	pa2m_afirmar(cantidad == 1, "La cantidad de elementos del vector coincide con lo esperado");
 
-	const char esperado[] = "habitacion";
+	const char *esperado = "habitacion";
 
 	pa2m_afirmar(strcmp(objetos2[cantidad-1], esperado) == 0,
-		     "Todos los nombres de objeto son los esperados");
+		     "El objeto conocido es el esperado");
 
 	free(objetos);
 	free(objetos2);
