@@ -202,7 +202,7 @@ bool sala_agarrar_objeto(sala_t *sala, const char *nombre_objeto)
 	return EXITO;
 }
 
-char* sala_describir_objeto(sala_t *sala, const char *nombre_objeto)
+char *sala_describir_objeto(sala_t *sala, const char *nombre_objeto)
 {
 	if(!sala || !nombre_objeto) return NULL;
 
@@ -246,7 +246,7 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 			break;
 		} else {
 			if(((struct objeto *)hash_obtener(sala->objetos, objeto_principal))->es_asible
-				&& !hash_contiene(sala->objetos_poseidos, objeto_principal)){
+			   && !hash_contiene(sala->objetos_poseidos, objeto_principal)){
 				break;
 			}
 
