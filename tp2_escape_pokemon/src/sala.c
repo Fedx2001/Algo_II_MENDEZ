@@ -4,7 +4,7 @@
 #include "interaccion.h"
 #include "lista.h"
 #include "hash.h"
-#include "funciones_auxiliares.h"
+#include "funciones_auxiliares_sala.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
