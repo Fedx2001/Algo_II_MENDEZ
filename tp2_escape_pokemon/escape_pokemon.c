@@ -1,9 +1,26 @@
 #include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 #include "src/sala.h"
-#include "src/menu_juego.h"
 
 #define ERROR_EJECUCION -1
 #define BUFFER_ENTRADA 1024
+#define CANTIDAD_ENTRADAS 3
+#define LIMPIAR_PANTALLA "\033[1;1H\033[2J"
+#define BLANCO "\x1b[37;1m"
+#define VERDE "\x1b[32;1m"
+#define ROJO "\x1b[31;1m"
+#define AMARILLO "\x1b[33;1m"
+#define NORMAL "\x1b[0m"
+#define SALIR "salir"
+#define AYUDA "ayuda"
+#define AGARRAR "agarrar"
+#define DESCRIBIR "describir"
+#define POSISCION_VERBO 0
+#define POSISCION_OBJETO1 1
+#define POSISCION_OBJETO2 2
 
 char *en_minusculas(char *string)
 {
@@ -15,43 +32,149 @@ char *en_minusculas(char *string)
 	return string;
 }
 
-void mostrar_mensaje(const char *mensaje)
+void mostrar_intro()
 {
-	printf("%s\n", mensaje);
+	printf(LIMPIAR_PANTALLA);
+	printf(AMARILLO "Bienvenidx, amante de los pokémon.\n");
+	printf("Lamentablemente no estás acá para ser entrenador, así que ¿Qué haces acá? te estarás preguntando. ");
+	printf("Hoy te preparamos un reto. Tenés que escaparte de esta habitación.");
+	printf("\nPodés interactuar con tu entorno ingresando un verbo y un objeto (o dos si hiciera falta) en tu pokémovil.");
+	printf("\nPor ejemplo: 'abrir pokebola'.");
+	printf("\nO también si te resulta más natural, como una frase: 'abrir la pokebola'");
+	printf("\nAh! Que tonto de mi parte, casi olvidaba un gran detalle, si en algún momento no te acordás de los comandos" 
+	       "disponibles siempre podés consultarlos usando 'ayuda'.\n");
+	printf("Los verbos no estan limitados, así que ponete creativx!\n");
+	printf("\nAdelante, tu nueva aventura te espera, buen escape!\n");
+
+	printf(ROJO "\n<OOC>: No te preocupes de las mayúsculas y minúsculas, de eso me encargo yo detrás de escena ;) (siempre quize usar esa frase de rpl jejejejejeje)\n" NORMAL);
+
+	printf("Presiona enter para continuar...\n");
+	getchar();
+	printf(LIMPIAR_PANTALLA);
 }
 
-void mostrar_reglas()
+void mostrar_ayuda()
 {
-	printf("¿Como juego?\n");
+	printf(LIMPIAR_PANTALLA);
+	printf(ROJO "==================================================================\n");
+	printf(AMARILLO "PAGINA DE AYUDA\n");
+	printf("Algunos comandos disponibles:\n");
+	printf("-ayuda: Muestra esta página\n");
+	printf("-describir objeto: Describe el objeto indicado\n");
+	printf("-agarrar objeto: Agarra un objeto de la sala (si se puede agarrar)\n");
+	printf("-salir: Sale del juego\n" NORMAL);
+	printf(ROJO "==================================================================\n");
+
+	printf(NORMAL "Presiona enter para continuar...\n");
+	getchar();
+	printf(LIMPIAR_PANTALLA);
 }
 
-void mostrar_m(const char *mensaje, enum tipo_accion accion, void *aux)
+void mostrar_mensaje(const char *mensaje, enum tipo_accion accion, void *ignorado)
 {
-	printf("%s %d\n", mensaje, accion);
+	switch(accion){
+	case ESCAPAR:
+		printf(AMARILLO "%s\n", mensaje);
+		printf("Besitos besitos, chau chau.\n" NORMAL);
+		break;
+	case ACCION_INVALIDA:
+		printf(ROJO "No" AMARILLO " puedo hacer eso\n" NORMAL);
+		break;
+	default:
+		printf(AMARILLO "%s\n" NORMAL, mensaje);
+		break;
+	}
 }
 
-bool parsear_entrada(sala_t *sala, char *entrada)
+void liberar_vector(char **vector, size_t tamanio)
 {
-	// char *verbo = NULL;
-	// char *objeto1 = NULL;
-	// char *objeto2 = NULL;
+	for(int i = 0; i < tamanio; i++)
+		if(vector[i]) free(vector[i]);
+}
 
-	char entradas[3][20];
+void ejecutar_interaccion_con_palabras(sala_t *sala, char *verbo, char *objeto, char *objeto_parametro)
+{
+	if(strcmp(verbo, "ayuda") == 0) {
+		mostrar_ayuda();
+	} else if(strcmp(verbo, "describir") == 0) {
+		printf(AMARILLO "%s\n" NORMAL, sala_describir_objeto(sala, objeto));
+	} else if(strcmp(verbo, "agarrar") == 0) {
+		if(sala_agarrar_objeto(sala, objeto)){
+			printf(AMARILLO "Agarraste el/la %s\n" NORMAL, objeto);
+		} else {
+			printf(AMARILLO "No puedo agarrar eso\n" NORMAL);
+		}
+	} else {
+		int ejecutadas = sala_ejecutar_interaccion(sala, verbo, objeto, 
+								objeto_parametro, 
+								mostrar_mensaje, 
+								NULL
+							  );
+
+		if(ejecutadas == 0) mostrar_mensaje(NULL, ACCION_INVALIDA, NULL);
+	}
+}
+
+bool procesar_entrada(sala_t *sala)
+{
+	char buffer[BUFFER_ENTRADA];
+	
+	char *entrada = fgets(buffer, BUFFER_ENTRADA, stdin);
+
+	entrada[strlen(entrada)-1] = 0;
+	entrada = en_minusculas(entrada);
+
+	char *objetivos[CANTIDAD_ENTRADAS] = {NULL, NULL, NULL};
+	
 	int i = 0;
 	char *linea = strtok(entrada, " ");
-
 	while(linea){
-		strcpy(entradas[i], linea);
+		objetivos[i] = calloc(1, strlen(linea)+1);
+		strcpy(objetivos[i], linea);
 		linea = strtok(NULL, " ");
 		i++;
 	}
 
-	strcpy(entradas[2], "_");
+	printf(LIMPIAR_PANTALLA);
 
-	int ejecutadas = sala_ejecutar_interaccion(sala, entradas[0], entradas[1], entradas[2], mostrar_m, NULL);
-	printf("%i\n", ejecutadas);
+	if(!objetivos[POSISCION_VERBO] && !objetivos[POSISCION_OBJETO1] && !objetivos[POSISCION_OBJETO2]) {
+		printf(ROJO "Ingresa algo por favor ;-;\n" NORMAL);
+	} else if(strcmp(objetivos[POSISCION_VERBO], "salir") == 0 && !objetivos[POSISCION_OBJETO1]) {
+		liberar_vector(objetivos, CANTIDAD_ENTRADAS);
+		return true;
+	} else {
+		ejecutar_interaccion_con_palabras(sala, objetivos[POSISCION_VERBO], 
+						  objetivos[POSISCION_OBJETO1], 
+						  objetivos[POSISCION_OBJETO2]
+						);
+	}
 
-	return true;
+	liberar_vector(objetivos, CANTIDAD_ENTRADAS);
+
+	return false;
+}
+
+void mostrar_objetos(sala_t *sala)
+{
+	int cantidad_conocidos = 0;
+	int cantidad_poseidos = 0;
+
+	char **objetos_conocidos = sala_obtener_nombre_objetos_conocidos(sala, &cantidad_conocidos);
+	char **objetos_poseidos = sala_obtener_nombre_objetos_poseidos(sala, &cantidad_poseidos);
+
+	printf("\nOBJETOS CONOCIDOS\n");
+	for(int i = 0; i < cantidad_conocidos; i++)
+		printf(VERDE "%s\n" NORMAL, objetos_conocidos[i]);
+
+	printf("\nOBJETOS POSEIDOS\n");
+	if(cantidad_poseidos == 0)
+		printf(ROJO "No tenés nada en tu inventario\n" NORMAL);
+	
+	for(int i = 0; i < cantidad_poseidos; i++)
+		printf(VERDE "%s\n" NORMAL, objetos_poseidos[i]);
+	
+	free(objetos_conocidos);
+	free(objetos_poseidos);
 }
 
 int main(int argc, char *argv[])
@@ -65,34 +188,22 @@ int main(int argc, char *argv[])
 		return ERROR_EJECUCION;
 	}
 	
-	mostrar_reglas();
+	mostrar_intro();
 
-	menu_t *menu = menu_crear();
-	agregar_comando(menu, "ayuda", "Mostrar comandos disponibles");
-	agregar_comando(menu, "agarrar <objeto>", "Agarra un objeto conocido");
-	agregar_comando(menu, "describir <objeto>", "Describe el objeto pedido");
-	agregar_comando(menu, "salir", "Sale del juego");
+	mostrar_ayuda();
 
-	char buffer[BUFFER_ENTRADA];
+	bool salir = false;
 
-	do{
-		printf(">");
-		char *entrada = fgets(buffer, BUFFER_ENTRADA, stdin);
-		entrada[strlen(entrada)-1] = 0;
-		entrada = en_minusculas(entrada);
+	while(!sala_escape_exitoso(sala) && !salir){
+		mostrar_objetos(sala);
+		
+		printf("\n¿Que querés hacer?");
+		printf("\n>");
+		
+		salir = procesar_entrada(sala);
+	}
 
-		parsear_entrada(sala, entrada);
-
-		if(strcmp(entrada, "ayuda") == 0) 
-			mostrar_ayuda(menu);
-		else if(strcmp(entrada, "describir") == 0) 
-			mostrar_mensaje(sala_describir_objeto(sala, "habitacion"));
-		else if(strcmp(entrada, "agarrar") == 0) 
-			mostrar_mensaje("NO, CHUPALA");
-		else if(strcmp(entrada, "salir") == 0) 
-			break;
-
-	} while(!sala_escape_exitoso(sala));
+	if(salir) printf(ROJO "NOOOOOOO VOLVEEEEE ;-; ;-;\n" NORMAL);
 
 	sala_destruir(sala);
 
