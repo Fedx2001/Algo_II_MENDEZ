@@ -328,7 +328,7 @@ int comparar_interacciones(void *interaccion_comparada, void *interaccion_a_comp
 	
 	int comparacion_verbo = strcmp(actual->verbo, a_comparar->verbo);
 	int comparacion_objeto1 = strcmp(actual->objeto, a_comparar->objeto);
-	int comparacion_objeto2 = strcmp(actual->objeto_parametro, a_comparar->objeto_parametro);		
+	int comparacion_objeto2 = strcmp(actual->objeto_parametro, a_comparar->objeto_parametro);
 
 	if(comparacion_verbo == COMPARACION_EXITO && 
 	   comparacion_objeto1 == COMPARACION_EXITO && 
@@ -354,8 +354,8 @@ int sala_ejecutar_interaccion(sala_t *sala, const char *verbo,
 	
 	strcpy(a_comparar.verbo, verbo);
 	strcpy(a_comparar.objeto, objeto1);
-	
-	if(!objeto2) strcpy(a_comparar.objeto_parametro, "_");
+
+	if(!objeto2) strcpy(a_comparar.objeto_parametro, "");
 	else strcpy(a_comparar.objeto_parametro, objeto2);
 
 	lista_iterador_t *it = lista_iterador_crear(sala->interacciones);
