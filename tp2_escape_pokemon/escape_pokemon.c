@@ -48,9 +48,9 @@ void ejecutar_interaccion_con_palabras(sala_t *sala, char *verbo, char *objeto, 
 			printf(AMARILLO "No puedo agarrar eso\n" NORMAL);
 		}
 	} else {
-		int ejecutadas = sala_ejecutar_interaccion(sala, verbo, objeto, 
-								objeto_parametro, 
-								mostrar_mensaje, 
+		int ejecutadas = sala_ejecutar_interaccion(sala, verbo, objeto,
+								objeto_parametro,
+								mostrar_mensaje,
 								NULL
 							  );
 
@@ -74,24 +74,24 @@ char *en_minusculas(char *string)
 		int caracter = *p;
 		*p = (char)tolower(caracter);
 	}
-	
+
 	return string;
 }
 
 bool pedir_y_procesar_entrada(sala_t *sala)
 {
 	char buffer[BUFFER_ENTRADA];
-	
+
 	char *entrada = fgets(buffer, BUFFER_ENTRADA, stdin);
 
 	entrada[strlen(entrada)-1] = 0;
 	entrada = en_minusculas(entrada);
 
 	char *objetivos[CANTIDAD_OBJETIVOS] = {NULL, NULL, NULL};
-	
+
 	int i = 0;
 	char *linea = strtok(entrada, " ");
-	while(linea){
+	while(linea) {
 		objetivos[i] = calloc(1, strlen(linea)+1);
 		strcpy(objetivos[i], linea);
 		linea = strtok(NULL, " ");
@@ -106,8 +106,8 @@ bool pedir_y_procesar_entrada(sala_t *sala)
 		liberar_vector(objetivos, CANTIDAD_OBJETIVOS);
 		return true;
 	} else {
-		ejecutar_interaccion_con_palabras(sala, objetivos[POSISCION_VERBO], 
-						  objetivos[POSISCION_OBJETO1], 
+		ejecutar_interaccion_con_palabras(sala, objetivos[POSISCION_VERBO],
+						  objetivos[POSISCION_OBJETO1],
 						  objetivos[POSISCION_OBJETO2]
 						);
 	}
@@ -129,8 +129,8 @@ void mostrar_intro()
 	printf("\nTambién contas con los siguientes comandos:\n"
 	       "-salir: Sale del juego\n"
 	       "-agarrar objeto: Agarra un objeto de la sala (siempre que pueda ser agarrado)\n"
-	       "-describir objeto: describe un objeto conocido o en el inventario\n");	
-	printf("Ah! Que tonto de mi parte, casi olvidaba un gran detalle. Si en algún momento no te acordás de los comandos" 
+	       "-describir objeto: describe un objeto conocido o en el inventario\n");
+	printf("Ah! Que tonto de mi parte, casi olvidaba un gran detalle. Si en algún momento no te acordás de los comandos"
 	       " disponibles siempre podés consultarlos usando 'ayuda'.\n");
 	printf("El juego está diseñado para hacerte pensar, así que ponete creativx con los verbos!\n");
 	printf("\nAdelante, tu nueva aventura te espera, y que tengas un buen escape!\n");
@@ -157,7 +157,7 @@ void mostrar_objetos(sala_t *sala)
 	printf("\nEn tu inventario tenés las siguientes cosas:\n");
 	if(cantidad_poseidos == 0)
 		printf(ROJO "No tenés nada por ahora.\n" NORMAL);
-	
+
 	for(int i = 0; i < cantidad_poseidos; i++)
 		printf(VERDE "%s\n" NORMAL, objetos_poseidos[i]);
 
@@ -167,25 +167,24 @@ void mostrar_objetos(sala_t *sala)
 
 int main(int argc, char *argv[])
 {
-	if(argc != 3)
-		return ERROR_EJECUCION;
+	if(argc != 3) return EXIT_FAILURE;
 
 	sala_t *sala = sala_crear_desde_archivos(argv[1], argv[2]);
 	if(!sala) {
-		printf("Error al crear la sala de escape\n");
-		return ERROR_EJECUCION;
+		printf(ROJO "Error al crear la sala de escape\n" NORMAL);
+		return EXIT_FAILURE;
 	}
-	
+
 	mostrar_intro();
 
 	bool salir = false;
 
 	while(!sala_escape_exitoso(sala) && !salir){
 		mostrar_objetos(sala);
-		
+
 		printf("\n¿Que querés hacer?");
 		printf("\n>");
-		
+
 		salir = pedir_y_procesar_entrada(sala);
 	}
 
@@ -193,5 +192,5 @@ int main(int argc, char *argv[])
 
 	sala_destruir(sala);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
