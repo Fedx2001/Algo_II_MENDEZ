@@ -1,12 +1,12 @@
+#include <stdbool.h>
+#include <string.h>
 #include "pa2mm.h"
 #include "src/estructuras.h"
 #include "src/sala.h"
 #include "src/estructura_sala.h"
 #include "src/objeto.h"
 #include "src/interaccion.h"
-
-#include "string.h"
-#include <stdbool.h>
+#include "src/bubblesort.h"
 
 void pruebasCrearObjeto()
 {
@@ -108,6 +108,11 @@ void pruebas_crear_sala()
 	sala_destruir(sala);
 }
 
+int comparar_strings(void *string1, void *string2)
+{
+	return strcmp((char *)string1, (char *)string2);
+}
+
 void pruebas_nombre_objetos()
 {
 	int cantidad = 0;
@@ -126,14 +131,16 @@ void pruebas_nombre_objetos()
 		     "Puedo pedir el vector de nombres a la sala pasando cantidad no NULL");
 	pa2m_afirmar(cantidad == 9, "La cantidad de elementos del vector coincide con lo esperado");
 
-	const char *esperados[] = {"habitacion", "mesa", "interruptor", "pokebola", "cajon",
-				    "cajon-abierto", "llave", "anillo",	"puerta"};
+	const char *esperados[] = {"anillo", "cajon", "cajon-abierto", "habitacion", "interruptor", 
+				   "llave", "mesa", "pokebola", "puerta"};
+
+	bubblesort_strings(objetos2, (size_t)cantidad);
 
 	int comparaciones_exitosas = 0;
-
-	for (int i = 0; i < cantidad; i++)
-		if (strcmp(objetos2[i], esperados[i]) == 0)
+	for(int i = 0; i < cantidad; i++) {
+		if(strcmp(objetos2[i], esperados[i]) == 0)
 			comparaciones_exitosas++;
+	}
 
 	pa2m_afirmar(comparaciones_exitosas == cantidad,
 		     "Todos los nombres de objeto son los esperados");
@@ -180,7 +187,8 @@ void pruebas_nombre_objetos_conocidos()
 	char **objetos2 = sala_obtener_nombre_objetos_conocidos(sala, &cantidad);
 	pa2m_afirmar(objetos2 != NULL,
 		     "Puedo pedir el vector de nombres conocidos a la sala pasando cantidad no NULL");
-	pa2m_afirmar(cantidad == 1, "La cantidad de elementos del vector coincide con lo esperado");
+	
+	pa2m_afirmar(cantidad == 1, "Solo hay 1 objeto conocido en la sala");
 
 	const char *esperado = "habitacion";
 
@@ -337,15 +345,23 @@ void pruebas_ejecutar_interaccion()
 
 	int cantidad = 0;
 
-	char **objetos_conocidos1 = sala_obtener_nombre_objetos_conocidos(sala, &cantidad);
+	char **objetos_conocidos = sala_obtener_nombre_objetos_conocidos(sala, &cantidad);
 	int comparaciones_exitosas = 0;
 
-	if(strcmp(objetos_conocidos1[0], "pokebola") == 0) comparaciones_exitosas++;
-	if(strcmp(objetos_conocidos1[1], "habitacion") == 0) comparaciones_exitosas++;
-	if(strcmp(objetos_conocidos1[2], "puerta") == 0) comparaciones_exitosas++;
+	char *conocidos_esperados[] = {"habitacion", "pokebola", "puerta"};
+
+	bubblesort_strings(objetos_conocidos, (size_t)cantidad);
+
+	comparaciones_exitosas = 0;
+
+	for(int i = 0; i < cantidad; i++)
+		if(strcmp(objetos_conocidos[i], conocidos_esperados[i]) == 0)
+			comparaciones_exitosas++;
+
+	free(objetos_conocidos);
 
 	pa2m_afirmar(cantidad == 3, "Ahora conozco 3 objetos");
-	pa2m_afirmar(comparaciones_exitosas == 3, "Los objetos son pokebola, habitacion y puerta");
+	pa2m_afirmar(comparaciones_exitosas == cantidad, "Los objetos son pokebola, habitacion y puerta");
 
 	aux.cantidad_ejecutadas = 0;
 	ejecutadas = sala_ejecutar_interaccion(sala, "examinar", "habitacion", "", mostrar_mensaje_con_tipo, &aux);
@@ -367,8 +383,22 @@ void pruebas_ejecutar_interaccion()
 	bool agarrado = sala_agarrar_objeto(sala, "pokebola");
 	pa2m_afirmar(agarrado, "Agarré la pokébola");
 
+	char **objetos_agarrados = sala_obtener_nombre_objetos_poseidos(sala, &cantidad);
+	
+	pa2m_afirmar(cantidad == 1, "Ahora tengo 1 objeto en posesión");
+	
+	pa2m_afirmar(strcmp(objetos_agarrados[cantidad-1], "pokebola") == 0, "El objeto es la pokebola");
+
+	free(objetos_agarrados);
+
 	ejecutadas = sala_ejecutar_interaccion(sala, "abrir", "pokebola", "", NULL, NULL);
 	pa2m_afirmar(ejecutadas == 2, "Abrí la pokébola y se eliminó de la sala");
+
+	objetos_agarrados = sala_obtener_nombre_objetos_poseidos(sala, &cantidad);
+
+	pa2m_afirmar(cantidad == 0, "Ya no tengo la pokebola en posesión");
+
+	free(objetos_agarrados);
 
 	ejecutadas = sala_ejecutar_interaccion(sala, "examinar", "habitacion", "", mostrar_mensaje_con_tipo, &aux);
 	pa2m_afirmar(ejecutadas == 0, "Examinar la habitación de nuevo no descubre la pokébola (fue eliminada)");
@@ -410,7 +440,6 @@ void pruebas_ejecutar_interaccion()
 	pa2m_afirmar(ejecutadas == 1, "Puedo salir por la puerta abierta");
 	pa2m_afirmar(sala_escape_exitoso(sala), "Se actualizó el estado del escape a escape exitoso");
 
-	free(objetos_conocidos1);
 	sala_destruir(sala);
 }
 
