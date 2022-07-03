@@ -34,17 +34,17 @@ struct aux{
 sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones)
 {
 	if(!objetos || !interacciones) return NULL;
-	
+
 	sala_t *sala = calloc(1, sizeof(sala_t));
 	if(!sala) return NULL;
-	
+
 	sala->objetos_conocidos = hash_crear(HASH_TAMANIO_DEFAULT);
 	sala->objetos_poseidos = hash_crear(HASH_TAMANIO_DEFAULT);
 	sala->objetos = hash_crear(HASH_TAMANIO_DEFAULT);
 	sala->interacciones = lista_crear();
 	sala->escape_exitoso = false;
 
-	if(!sala->objetos_conocidos || !sala->objetos_poseidos || !sala->objetos || !sala->interacciones) 
+	if(!sala->objetos_conocidos || !sala->objetos_poseidos || !sala->objetos || !sala->interacciones)
 		return NULL;
 
 	char buffer[MAX_BUFFER_LECTURA];
@@ -55,9 +55,9 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 		sala_destruir(sala);
 		return NULL;
 	}
-	
+
 	int i = 0;
-	
+
 	linea = fgets(buffer, MAX_BUFFER_LECTURA, f_objetos);
 
 	while(linea){
@@ -68,12 +68,12 @@ sala_t *sala_crear_desde_archivos(const char *objetos, const char *interacciones
 			fclose(f_objetos);
 			return NULL;
 		}
-		
+
 		if(i == 0){
 			hash_insertar(sala->objetos_conocidos, actual->nombre, actual, NULL);
 			i++;
 		}
-		
+
 		linea = fgets(buffer, MAX_BUFFER_LECTURA, f_objetos);
 	}
 	fclose(f_objetos);
@@ -133,7 +133,7 @@ char **sala_obtener_nombre_objetos(sala_t *sala, int *cantidad)
 	struct aux contenedor;
 	contenedor.elementos = 0;
 	contenedor.vector = nombres_objs;
-	
+
 	hash_con_cada_clave(sala->objetos, agregar_nombres_en_vector, &contenedor);
 
 	return nombres_objs;
@@ -145,7 +145,7 @@ char **sala_obtener_nombre_objetos_conocidos(sala_t *sala, int *cantidad)
 		if(cantidad) *cantidad = -1;
 		return NULL;
 	}
-	
+
 	if(cantidad) *cantidad = (int)hash_cantidad(sala->objetos_conocidos);
 
 	char **nombres_conocidos = calloc(1, hash_cantidad(sala->objetos_conocidos) * sizeof(char *));
@@ -157,9 +157,9 @@ char **sala_obtener_nombre_objetos_conocidos(sala_t *sala, int *cantidad)
 	struct aux contenedor;
 	contenedor.elementos = 0;
 	contenedor.vector = nombres_conocidos;
-	
+
 	hash_con_cada_clave(sala->objetos_conocidos, agregar_nombres_en_vector, &contenedor);
-	
+
 	return nombres_conocidos;
 }
 
@@ -169,7 +169,7 @@ char **sala_obtener_nombre_objetos_poseidos(sala_t *sala, int *cantidad)
 		if(cantidad) *cantidad = -1;
 		return NULL;
 	}
-	
+
 	if(cantidad) *cantidad = (int)hash_cantidad(sala->objetos_poseidos);
 
 	char **nombres_poseidos = calloc(1, hash_cantidad(sala->objetos_poseidos) * sizeof(char *));
@@ -181,9 +181,9 @@ char **sala_obtener_nombre_objetos_poseidos(sala_t *sala, int *cantidad)
 	struct aux contenedor;
 	contenedor.elementos = 0;
 	contenedor.vector = nombres_poseidos;
-	
+
 	hash_con_cada_clave(sala->objetos_poseidos, agregar_nombres_en_vector, &contenedor);
-	
+
 	return nombres_poseidos;
 }
 
@@ -208,21 +208,21 @@ char *sala_describir_objeto(sala_t *sala, const char *nombre_objeto)
 
 	struct objeto *objeto = hash_obtener(sala->objetos_conocidos, nombre_objeto);
 	if(objeto) return objeto->descripcion;
-		
+
 	objeto = hash_obtener(sala->objetos_poseidos, nombre_objeto);
 	if(objeto) return objeto->descripcion;
 
 	return NULL;
 }
 
-void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *cantidad_ejecutadas, 
+void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *cantidad_ejecutadas,
 			  void (*mostrar_mensaje)(const char *mensaje,
 						  enum tipo_accion accion,
 						  void *aux),
 			  void *aux)
 {
 	if(!sala || !a_ejecutar || !cantidad_ejecutadas) return;
-	
+
 	enum tipo_accion tipo = a_ejecutar->accion.tipo;
 	char *mensaje = a_ejecutar->accion.mensaje;
 
@@ -232,7 +232,7 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 
 	switch(tipo){
 	case MOSTRAR_MENSAJE:
-		if(hash_contiene(sala->objetos_conocidos, objeto_principal) || 
+		if(hash_contiene(sala->objetos_conocidos, objeto_principal) ||
 		   hash_contiene(sala->objetos_poseidos, objeto_principal)){
 			if(mostrar_mensaje && mensaje){
 				mostrar_mensaje(mensaje, MOSTRAR_MENSAJE, aux);
@@ -252,12 +252,12 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 
 			struct objeto *objeto = hash_obtener(sala->objetos, objeto_accion);
 			if(!objeto) break;
-			
+
 			hash_t *resultado = hash_insertar(sala->objetos_conocidos, objeto->nombre, objeto, NULL);
 			if(!resultado) break;
 
 			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, DESCUBRIR_OBJETO, aux);
-			
+
 			(*cantidad_ejecutadas)++;
 		}
 		break;
@@ -268,19 +268,19 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 		} else {
 			struct objeto *nuevo = hash_obtener(sala->objetos, objeto_accion);
 			struct objeto *viejo = hash_quitar(sala->objetos, objeto_parametro);
-			
+
 			if(!viejo || !nuevo) break;
-			
+
 			hash_quitar(sala->objetos_conocidos, objeto_parametro);
 			hash_quitar(sala->objetos_poseidos, objeto_parametro);
 
 			free(viejo);
-			
+
 			hash_t *resultado = hash_insertar(sala->objetos_conocidos, nuevo->nombre, nuevo, NULL);
 			if(!resultado) break;
-			
+
 			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, REEMPLAZAR_OBJETO, aux);
-			
+
 			(*cantidad_ejecutadas)++;
 		}
 
@@ -290,12 +290,12 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 			&& !hash_contiene(sala->objetos_poseidos, objeto_principal)){
 			break;
 		} else {
-			struct objeto *quitado = hash_quitar(sala->objetos, objeto_principal);
+			struct objeto *quitado = hash_quitar(sala->objetos, objeto_accion);
 			if(!quitado) break;
 
-			hash_quitar(sala->objetos_conocidos, objeto_principal);
-			hash_quitar(sala->objetos_poseidos, objeto_principal);
-			
+			hash_quitar(sala->objetos_conocidos, objeto_accion);
+			hash_quitar(sala->objetos_poseidos, objeto_accion);
+
 			free(quitado);
 
 			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, ELIMINAR_OBJETO, aux);
@@ -308,9 +308,9 @@ void ejecutar_interaccion(sala_t *sala, struct interaccion *a_ejecutar, int *can
 		if(hash_contiene(sala->objetos_conocidos, objeto_principal) ||
 		   hash_contiene(sala->objetos_poseidos, objeto_principal)){
 			sala->escape_exitoso = true;
-		
+
 			if(mostrar_mensaje && mensaje) mostrar_mensaje(mensaje, ESCAPAR, aux);
-			
+
 			(*cantidad_ejecutadas)++;
 		}
 		break;
@@ -325,15 +325,15 @@ int comparar_interacciones(void *interaccion_comparada, void *interaccion_a_comp
 
 	struct interaccion *actual = interaccion_comparada;
 	struct interaccion *a_comparar = interaccion_a_comparar;
-	
+
 	int comparacion_verbo = strcmp(actual->verbo, a_comparar->verbo);
 	int comparacion_objeto1 = strcmp(actual->objeto, a_comparar->objeto);
 	int comparacion_objeto2 = strcmp(actual->objeto_parametro, a_comparar->objeto_parametro);
 
-	if(comparacion_verbo == COMPARACION_EXITO && 
-	   comparacion_objeto1 == COMPARACION_EXITO && 
+	if(comparacion_verbo == COMPARACION_EXITO &&
+	   comparacion_objeto1 == COMPARACION_EXITO &&
 	   comparacion_objeto2 == COMPARACION_EXITO
-	) 
+	)
 		return COMPARACION_EXITO;
 
 	return COMPARACION_ERROR;
@@ -351,7 +351,7 @@ int sala_ejecutar_interaccion(sala_t *sala, const char *verbo,
 	if(!sala || !verbo || !objeto1) return cantidad_ejecutadas;
 
 	struct interaccion a_comparar;
-	
+
 	strcpy(a_comparar.verbo, verbo);
 	strcpy(a_comparar.objeto, objeto1);
 
@@ -379,10 +379,10 @@ bool sala_es_interaccion_valida(sala_t *sala, const char *verbo, const char *obj
 	if(sala == NULL || verbo == NULL || objeto1 == NULL) return false;
 
 	struct interaccion a_comparar;
-	
+
 	strcpy(a_comparar.verbo, verbo);
 	strcpy(a_comparar.objeto, objeto1);
-	
+
 	if(!objeto2) strcpy(a_comparar.objeto_parametro, "_");
 	else strcpy(a_comparar.objeto_parametro, objeto2);
 
