@@ -95,16 +95,20 @@ bool pedir_y_procesar_entrada(sala_t *sala)
 
 	while(linea) {
 		if(i < CANTIDAD_OBJETIVOS) { 
-			objetivos[i] = calloc(1, strlen(linea)+1);
-			strcpy(objetivos[i], linea);
+			if(strlen(linea)+1 <= MAX_PALABRA) {
+				objetivos[i] = calloc(1, strlen(linea)+1);
+				strcpy(objetivos[i], linea);
+			}
 		}
+		
 		linea = strtok(NULL, " ");
 		i++;
+		
 		if(i > CANTIDAD_OBJETIVOS) treshold_excedido = true;
 	}
 
 	if(!objetivos[POSISCION_VERBO] && !objetivos[POSISCION_OBJETO1] && !objetivos[POSISCION_OBJETO2]) {
-		printf(ROJO "Ingresa algo por favor ;-;\n" NORMAL);
+		printf(ROJO "Ingresa algo válido por favor ;-;\n" NORMAL);
 	} else if(strcmp(objetivos[POSISCION_VERBO], SALIR) == 0 && !objetivos[POSISCION_OBJETO1]) {
 		liberar_vector(objetivos, CANTIDAD_OBJETIVOS);
 		return true;

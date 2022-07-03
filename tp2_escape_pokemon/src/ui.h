@@ -24,6 +24,7 @@
 #define POSISCION_VERBO 0
 #define POSISCION_OBJETO1 1
 #define POSISCION_OBJETO2 2
+#define MAX_PALABRA 20
 
 /*
  * Toma un string y lo pasa a minúsculas in-place.
