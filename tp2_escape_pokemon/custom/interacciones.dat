@@ -1,7 +1,7 @@
 habitacion;examinar;_;d:puerta:Hay una puerta con un lector
 puerta;abrir;_;m:_:La puerta esta cerrada con llave
 puerta;quemar;encendedor;m:_:¿Y si te digo que la puerta es de metal? Sí, la puerta es de metal.
-puerta;desatornillar;destornillador;r:puerta-abierta:...............ok.
+destornillador;desatornillar;puerta;r:puerta-abierta:...desatornillas la puerta??????????? ...y cae al piso, i guess?????????
 tarjeta-rocket;usar;puerta;r:puerta-abierta:La puerta se abre.
 tarjeta-rocket;romper;_;m:_:Si hacés eso, como pretendes escapar?
 habitacion;examinar;_;d:pokebola:Hay una pokebola en el piso
