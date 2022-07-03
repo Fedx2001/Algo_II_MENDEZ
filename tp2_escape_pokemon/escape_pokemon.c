@@ -91,21 +91,24 @@ bool pedir_y_procesar_entrada(sala_t *sala)
 
 	int i = 0;
 	char *linea = strtok(entrada, " ");
+	bool treshold_excedido = false;
+
 	while(linea) {
-		objetivos[i] = calloc(1, strlen(linea)+1);
-		strcpy(objetivos[i], linea);
+		if(i < CANTIDAD_OBJETIVOS) { 
+			objetivos[i] = calloc(1, strlen(linea)+1);
+			strcpy(objetivos[i], linea);
+		}
 		linea = strtok(NULL, " ");
 		i++;
+		if(i > CANTIDAD_OBJETIVOS) treshold_excedido = true;
 	}
-
-	printf(LIMPIAR_PANTALLA);
 
 	if(!objetivos[POSISCION_VERBO] && !objetivos[POSISCION_OBJETO1] && !objetivos[POSISCION_OBJETO2]) {
 		printf(ROJO "Ingresa algo por favor ;-;\n" NORMAL);
 	} else if(strcmp(objetivos[POSISCION_VERBO], SALIR) == 0 && !objetivos[POSISCION_OBJETO1]) {
 		liberar_vector(objetivos, CANTIDAD_OBJETIVOS);
 		return true;
-	} else {
+	} else if(!treshold_excedido) {
 		ejecutar_interaccion_con_palabras(sala, objetivos[POSISCION_VERBO],
 						  objetivos[POSISCION_OBJETO1],
 						  objetivos[POSISCION_OBJETO2]
