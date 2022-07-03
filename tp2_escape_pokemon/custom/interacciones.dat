@@ -1,0 +1,34 @@
+habitacion;examinar;_;d:puerta:Hay una puerta con un lector
+puerta;abrir;_;m:_:La puerta esta cerrada con llave
+puerta;quemar;encendedor;m:_:¿Y si te digo que la puerta es de metal? Sí, la puerta es de metal.
+puerta;desatornillar;destornillador;r:puerta-abierta:...............ok.
+tarjeta-rocket;usar;puerta;r:puerta-abierta:La puerta se abre.
+tarjeta-rocket;romper;_;m:_:Si hacés eso, como pretendes escapar?
+habitacion;examinar;_;d:pokebola:Hay una pokebola en el piso
+habitacion;examinar;_;d:cofre-gris:Hay un cofre gris en la habitacion
+habitacion;examinar;_;d:pared-sospechosa:Un pedazo de pared parece algo sospechoso
+pokebola;abrir;_;d:llave-gris:hay una llave gris dentro de la pokebola
+pokebola;abrir;_;e:pokebola:No necesitas mas la pokebola
+cofre-gris;abrir;_;m:_:El cofre está cerrado con llave
+cofre-gris;abrir;llave-gris;d:cofre-pikachu:Encontras un cofre pequeño con una insignia de Pikachu
+cofre-gris;abrir;llave-gris;d:destornillador:Hay un destornillador adentro del cofre gris
+cofre-gris;abrir;llave-gris;d:encendedor:Hay un encendedor adentro del cofre gris
+cofre-gris;abrir;llave-gris;e:llave-gris:La llave desaparece
+cofre-pikachu;abrir;_;m:_:A menos que puedas romper un cofre metalico con tus manos, no parece ser posible abrirlo.
+cofre-pikachu;romper;_;m:_:Intentas romper el cofre, pero lo único que logras es rallarlo. Y lastimar tus manos.
+cofre-pikachu;quemar;encendedor;m:_:Tardarías un par de años para derretir el metal del cofre, mejor usa tu tiempo en otra cosa.
+cofre-pikachu;abrir;llave-pikachu;d:tarjeta-rocket:Encontras un cofre pequeño con una insignia de Pikachu
+cofre-pikachu;abrir;llave-pikachu;e:llave-pikachu:La llave desaparece
+pared-sospechosa;quemar;encendedor;d:interruptor-de-luz:Detrás de la ahora quemada pared encontrás un interruptor de luz
+pared-sospechosa;quemar;encendedor;e:encendedor:El encendedor se queda sin gas, ya no te es más de utilidad
+interruptor-de-luz;desatornillar;destornillador;d:llave-pikachu:Hay una llave con una insignia de pikachu detras del interruptor
+interruptor-de-luz;desatornillar;destornillador;e:interruptor-de-luz:El interruptor no parece ser de utilidad
+interruptor-de-luz;desatornillar;_;m:_:Necesito un destornillador
+interruptor-de-luz;quemar;_;m:_:¿Acaso querés explotar todo?
+habitacion;ooc;_;m:_:creo que todos odiamos este tp, pero admito que fue interesante
+habitacion;pista1;_;m:_:mmmm bueno, desatornillar, quemar y usar son tres palabras que me gustan (en realidad no)
+habitacion;pista2;_;m:_:da, mas pistas querés? encontrá las llaves y despues hablamos
+habitacion;pista3;_;m:_:no.
+habitacion;valen;_;m:_:hola Valen, ¿todo ok? espero que no estés sufriendo con este tp jajajaj love ya <3
+habitacion;secret;_;m:_:...??? secreto mio? bueno pero solo por esta vez: being NB is cool.
+puerta-abierta;salir;_;g:_:La luz del dia resplandece fuertemente en tus ojos nuevamente. Ganaste! pero te quedaste ciego. (toma eso profe Oak..??)

@@ -1,0 +1,13 @@
+habitacion;Una habitación común y corriente. Quizás puedas encontrar algo si examinas...;false
+puerta;Una puerta vieja que tiene un lector de tarjetas.;false
+pokebola;Una pokébola roja y blanca. Parece estar cerrada.;true
+llave-gris;Una llave grisásea y oxidada.;true
+cofre-gris;Un cofre gris.;false
+encendedor;Un encendedor, parece que todavia tiene algo de gas.;true
+destornillador;Un destornillador común.;true
+cofre-pikachu;Un cofre pequeño con una insignia de pikachu.;false
+tarjeta-rocket;Una tarjeta de acceso con el logo del equipo rocket. Como llego acá?;true
+pared-sospechosa;Un pedazo de la pared parece algo frágil y flamable. Extraño....;false
+interruptor-de-luz;Un interruptor de luz atornillado a la pared.;false
+llave-pikachu;Una llave algo más pequeña de lo normal con un logo de pikachu.;true
+puerta-abierta;La puerta esta totalmente abierta. Salir está al alcance de tu mano.;false
