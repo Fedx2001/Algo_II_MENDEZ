@@ -1,4 +1,4 @@
-#include "src/funciones_escape.h"
+#include "src/ui.h"
 
 void mostrar_mensaje(const char *mensaje, enum tipo_accion accion, void *aux)
 {
