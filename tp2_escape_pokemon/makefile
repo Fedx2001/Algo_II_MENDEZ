@@ -1,12 +1,12 @@
 VFLAGS=--leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2 --show-leak-kinds=all --trace-children=yes
 CFLAGS=-g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O2
-CC = gcc
-DEMO_OBJETOS=ejemplo/objetos.txt
-DEMO_INTERACCIONES=ejemplo/interacciones.txt
+CC=gcc
+EJEMPLO_OBJETOS=ejemplo/objetos.txt
+EJEMPLO_INTERS=ejemplo/interacciones.txt
 CUSTOM_OBJETOS=custom/objetos.dat
 CUSTOM_INTERACCIONES=custom/interacciones.dat
 
-all: clean valgrind-pruebas
+all: clean jugar-ejemplo
 
 
 pruebas: src/*.c pruebas.c
@@ -15,19 +15,19 @@ pruebas: src/*.c pruebas.c
 valgrind-pruebas: pruebas
 	valgrind $(VFLAGS) ./pruebas.o
 
-juego: escape_pokemon.c src/*.c
+compilar-juego: escape_pokemon.c src/*.c
 	$(CC) $(CFLAGS) escape_pokemon.c src/*.c -o juego.o
 
-valgrind-demo: juego
-	valgrind $(VFLAGS) ./juego.o $(DEMO_OBJETOS) $(DEMO_INTERACCIONES)
+valgrind-ejemplo: compilar-juego
+	valgrind $(VFLAGS) ./juego.o $(EJEMPLO_OBJETOS) $(EJEMPLO_INTERS)
 
-demo: juego
-	./juego.o $(DEMO_OBJETOS) $(DEMO_INTERACCIONES)
+jugar-ejemplo: compilar-juego
+	./juego.o $(EJEMPLO_OBJETOS) $(EJEMPLO_INTERS)
 
-valgrind-custom: juego
+valgrind-custom: compilar-juego
 	valgrind $(VFLAGS) ./juego.o $(CUSTOM_OBJETOS) $(CUSTOM_INTERACCIONES)
 
-custom: juego
+jugar-custom: compilar-juego
 	./juego.o $(CUSTOM_OBJETOS) $(CUSTOM_INTERACCIONES)
 
 clean:
