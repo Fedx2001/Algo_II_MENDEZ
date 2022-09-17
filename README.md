@@ -1,2 +1,2 @@
 # Algo_II_MENDEZ
-A collection of the resolution of projects for Algo2 Mendez, FIUBA.
+A collection of my resolution of the projects for Algo2 Mendez, FIUBA.
