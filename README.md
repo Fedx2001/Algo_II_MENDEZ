@@ -1,2 +1,2 @@
 # Algo_II_MENDEZ
-Projects for Algo2 Mendez, FIUBA.
+Mandatory projects for Algo2 Mendez, FIUBA.
